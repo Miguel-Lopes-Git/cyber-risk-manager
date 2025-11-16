@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 
 const WindowContext = createContext();
 
@@ -38,7 +38,7 @@ export function WindowProvider({ children }) {
                     isMaximized: false,
                     zIndex: prev.length,
                     position: { x: 0, y: 0 }, // Position initiale
-                    size: { width: 384, height: 384 }, // Taille initiale (w-96 h-96)
+                    size: { width: 700, height: 450 }, // Taille initiale (w-96 h-96)
                 },
             ];
         });
@@ -86,17 +86,17 @@ export function WindowProvider({ children }) {
         });
     };
 
-    const updateWindowPosition = (id, position) => {
+    const updateWindowPosition = useCallback((id, position) => {
         setWindows((prev) =>
             prev.map((w) => (w.id === id ? { ...w, position } : w))
         );
-    };
+    }, []);
 
-    const updateWindowSize = (id, size) => {
+    const updateWindowSize = useCallback((id, size) => {
         setWindows((prev) =>
             prev.map((w) => (w.id === id ? { ...w, size } : w))
         );
-    };
+    }, []);
 
     return (
         <WindowContext.Provider
