@@ -344,11 +344,11 @@ export function initScreenEffect(selector = "#screen", customConfig = {}) {
             image: {
                 enabled: true,
                 options: {
-                    src: "/images/test.png",
+                    src: "/images/background.png",
                     blur: 1.2,
                 },
             },
-            vignette: { enabled: false },
+            vignette: { enabled: true },
             scanlines: { enabled: true },
             vcr: {
                 enabled: false,
