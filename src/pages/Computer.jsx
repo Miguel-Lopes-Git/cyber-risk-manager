@@ -8,6 +8,7 @@ import Window from "@/components/UI/Window";
 import { WindowProvider, useWindows } from "@/contexts/WindowContext";
 import Player from "@/classes/Player";
 import Folder from "@/components/window/Folder";
+import Mail from "@/components/window/Mail";
 
 function ComputerContent() {
     // Initialisation du joueur
@@ -77,7 +78,7 @@ function ComputerContent() {
                             openWindow(
                                 "mail",
                                 "Mail",
-                                <p>Contenu des mails</p>,
+                                <Mail />,
                                 "/images/icons/mail.png"
                             )
                         }

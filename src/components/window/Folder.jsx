@@ -1,17 +1,45 @@
+import Image from "next/image";
+
+function IconFolder({ src, alt, text }) {
+    return (
+        <div className="flex flex-col items-center w-46 h-46 p-2 hover:bg-blue-400 hover:border-4 hover:border-blue-600 hover:p-1 cursor-pointer select-none">
+            <Image src={src} width={128} height={128} alt={alt} />
+            <p className="pt-2 text-3xl">{text}</p>
+        </div>
+    );
+}
+
 export default function Folder({ className }) {
     return (
         <div
             className={
-                className + " w-full h-full grid grid-cols-[0.3fr_0.7fr]"
+                className +
+                " w-full h-full flex justify-start items-start p-10 flex-wrap gap-6 overflow-auto"
             }
         >
-            {/* Arborescence */}
-            <div className="col-start-1 bg-amber-400">
-                <button className="text-2xl">Acceuil</button>
-            </div>
+            <IconFolder
+                src={"/images/icons/folder.webp"}
+                alt="Bureau"
+                text="Bureau"
+            />
 
-            {/* Contenu */}
-            <div className="col-start-2 bg-amber-700"></div>
+            <IconFolder
+                src={"/images/icons/folder.webp"}
+                alt="Documents"
+                text="Documents"
+            />
+
+            <IconFolder
+                src={"/images/icons/folder.webp"}
+                alt="Photos"
+                text="Photos"
+            />
+
+            <IconFolder
+                src={"/images/icons/folder.webp"}
+                alt="Vidéos"
+                text="Vidéos"
+            />
         </div>
     );
 }

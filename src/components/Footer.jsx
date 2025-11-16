@@ -42,7 +42,6 @@ export default function Footer({ className }) {
                 const data = await response.json();
                 if (data && data.hourly && data.hourly.temperature_2m) {
                     setCurrentWeather(data.hourly.temperature_2m[0] + "°C");
-                    console.log(data.hourly.temperature_2m[0] + "°C");
                 }
             } catch (error) {
                 console.error("Error fetching weather data:", error);

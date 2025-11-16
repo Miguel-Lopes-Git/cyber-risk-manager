@@ -136,7 +136,7 @@ export default function Window({
     }
 
     const windowStyle = isMaximized
-        ? "!absolute !top-0 !left-0 !w-full !h-[calc(100%-4rem)] !transform-none"
+        ? "!absolute !top-4 !left-0 !w-full !h-[calc(100%-6.5rem)] !transform-none"
         : "";
 
     return (
@@ -164,7 +164,11 @@ export default function Window({
                 onMouseDown={() => bringToFront(id)}
             >
                 {/* Window controls */}
-                <div className="w-full h-10 bg-blue-500 flex justify-between items-center px-2 header cursor-move">
+                <div
+                    className={`w-full h-10 bg-blue-500 flex justify-between items-center header cursor-move ${
+                        isMaximized ? " px-8" : "px-2"
+                    }`}
+                >
                     <h2 className="text-2xl text-white select-none">{title}</h2>
                     <div className="flex gap-2 select-none">
                         <button
@@ -205,7 +209,9 @@ export default function Window({
 
                 {/* Window content */}
                 <div
-                    className="bg-gray-300 w-full overflow-auto"
+                    className={`bg-[#e0dbba] w-full overflow-auto ${
+                        isMaximized ? "px-6" : ""
+                    }`}
                     style={{ height: "calc(100% - 2.5rem)" }}
                     onMouseDown={() => bringToFront(id)}
                 >
