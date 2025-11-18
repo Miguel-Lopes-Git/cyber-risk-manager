@@ -10,6 +10,7 @@ import Window from "@/components/UI/Window";
 import Player from "@/classes/Player";
 import Folder from "@/components/window/Folder";
 import Mail from "@/components/window/Mail";
+import Catalogue from "@/components/window/Catalogue";
 
 function ComputerContent() {
     // Mettre la page de connexion
@@ -151,6 +152,19 @@ function ComputerContent() {
                                     "shop",
                                     "Boutique",
                                     <p>Contenu de la boutique</p>,
+                                    "/images/icons/shop.png"
+                                )
+                            }
+                        />
+                        <Icon
+                            className="row-start-2 row-span-2 col-start-10 col-span-2"
+                            imagePath={"/images/icons/shop.png"}
+                            text={"Catalogue"}
+                            onClick={() =>
+                                openWindow(
+                                    "catalogue",
+                                    "Catalogue Composants",
+                                    <Catalogue />,
                                     "/images/icons/shop.png"
                                 )
                             }

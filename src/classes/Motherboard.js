@@ -71,11 +71,13 @@ export default class Motherboard {
         if (processor.socket !== this.socket) return false;
 
         // Vérification du type de RAM supporté
-        if (
-            processor.memorySupport &&
-            processor.memorySupport !== this.memoryType
-        ) {
-            return false;
+        if (processor.memorySupport) {
+            const supportedTypes = processor.memorySupport
+                .split("/")
+                .map((t) => t.trim());
+            if (!supportedTypes.includes(this.memoryType)) {
+                return false;
+            }
         }
 
         // Vérification personnalisée si fournie

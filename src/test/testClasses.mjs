@@ -18,14 +18,14 @@ console.log("=== DÉBUT DES TESTS ===");
 console.log("\n--- TEST 1 : Configuration Compatible ---");
 const server1 = new Server();
 
-// Sélection des composants (Intel i9 + Z790 + RTX 4090 + 1000W PSU)
-const cpu1 = processors.i9_13900k; // i9-13900K
-const cooler1 = cpuCoolers.corsair_h150i; // Corsair AIO (LGA1700 compatible)
-const mb1 = motherboards.asus_z790; // ASUS Z790
-const gpu1 = graphicsCards.rtx_4090; // RTX 4090
-const ram1 = ramModules.corsair_ddr5_16gb; // Corsair DDR5
-const psu1 = powerSupplies.corsair_rm1000x; // Corsair 1000W
-const case1 = cases.lianli_o11; // Lian Li O11
+// Sélection des composants (Pintel i9 + Z790 + Novideo RTX 4090 + 1000W PSU)
+const cpu1 = processors.pintel_core_i9_14900ks; // Pintel Core i9
+const cooler1 = cpuCoolers.pirate_h100i_rgb; // Pirate AIO
+const mb1 = motherboards.sus_rog_maximus_z790_hero; // Sus Z790
+const gpu1 = graphicsCards.novideo_rtx_4090; // Novideo RTX 4090
+const ram1 = ramModules.pirate_ddr5_64gb_6400; // Pirate DDR5
+const psu1 = powerSupplies.seasoned_1000w_titanium_full; // Seasoned 1000W
+const case1 = cases.lean_lee_o11_dynamic; // Lean Lee O11
 
 server1.addProcessor(cpu1);
 server1.addCpuCooler(cooler1);
@@ -59,13 +59,13 @@ console.log(`Prix total de la configuration : ${totalPrice1}€`);
 console.log("\n--- TEST 2 : Configuration Incompatible ---");
 const server2 = new Server();
 
-// Sélection des composants incompatibles (AMD CPU + Intel MB)
-const cpu2 = processors.ryzen9_7950x; // Ryzen 9 7950X (AM5)
-const cooler2 = cpuCoolers.noctua_nhd15; // Noctua (AM5 compatible)
-const mb2 = motherboards.asus_z790; // ASUS Z790 (LGA1700) - INCOMPATIBLE SOCKET
-const gpu2 = graphicsCards.rtx_4090; // RTX 4090
-const ram2 = ramModules.corsair_ddr5_16gb; // DDR5
-const psu2 = powerSupplies.corsair_rm1000x; // 1000W
+// Sélection des composants incompatibles (MAD CPU + Pintel MB)
+const cpu2 = processors.mad_rizen_9_7950x; // MAD Rizen 9 (AM5)
+const cooler2 = cpuCoolers.owlcool_nh_d15; // OwlCool (AM5 compatible)
+const mb2 = motherboards.sus_rog_maximus_z790_hero; // Sus Z790 (LGA1700) - INCOMPATIBLE SOCKET
+const gpu2 = graphicsCards.novideo_rtx_4090; // Novideo RTX 4090
+const ram2 = ramModules.pirate_ddr5_64gb_6400; // DDR5
+const psu2 = powerSupplies.seasoned_1000w_titanium_full; // 1000W
 
 server2.addProcessor(cpu2);
 server2.addCpuCooler(cooler2);
@@ -88,18 +88,18 @@ server2.printStatus();
 console.log("\n--- TEST 3 : Puissance Insuffisante ---");
 const server3 = new Server();
 
-// RTX 4090 (450W) + i9 (125W+) avec une petite alim
+// Novideo RTX 4090 (450W) + Pintel i9 (150W+) avec une petite alim
 import PowerSupply from "../classes/PowerSupply.js";
 const weakPsu = new PowerSupply({
-    brand: new Brand({ name: "Generic", country: "Unknown" }),
-    model: "Weak 400W",
+    brand: new Brand({ name: "Explosive", country: "Unknown" }),
+    model: "FireStarter 400",
     wattage: 400,
     efficiency: "None",
     modularity: "None",
     formFactor: "ATX",
     rails12V: 30,
     length: 140,
-    price: 30,
+    price: 20,
 });
 
 server3.addProcessor(cpu1);

@@ -91,12 +91,39 @@ export default class Server {
                         } ↔ Carte mère : le socket ne correspond pas.`
                     );
 
-                if (cpu.memorySupport !== mb.memoryType)
-                    issues.push(
-                        `CPU #${
-                            index + 1
-                        } ↔ Carte mère : type de RAM incompatible.`
-                    );
+                // Check memory compatibility using Motherboard method if available, or manual check
+                if (
+                    mb.isProcessorCompatible &&
+                    typeof mb.isProcessorCompatible === "function"
+                ) {
+                    // This method already checks memory, but we want a specific error message for RAM
+                    // So we can just check the memory string manually here to be safe or rely on the method
+                    // Let's replicate the logic:
+                    const supportedTypes = cpu.memorySupport
+                        ? cpu.memorySupport.split("/").map((t) => t.trim())
+                        : [];
+                    if (!supportedTypes.includes(mb.memoryType)) {
+                        issues.push(
+                            `CPU #${
+                                index + 1
+                            } ↔ Carte mère : type de RAM incompatible (${
+                                cpu.memorySupport
+                            } vs ${mb.memoryType}).`
+                        );
+                    }
+                } else if (cpu.memorySupport !== mb.memoryType) {
+                    // Fallback for old logic if needed, but we should use the split logic
+                    const supportedTypes = cpu.memorySupport
+                        ? cpu.memorySupport.split("/").map((t) => t.trim())
+                        : [];
+                    if (!supportedTypes.includes(mb.memoryType)) {
+                        issues.push(
+                            `CPU #${
+                                index + 1
+                            } ↔ Carte mère : type de RAM incompatible.`
+                        );
+                    }
+                }
             });
         }
 
