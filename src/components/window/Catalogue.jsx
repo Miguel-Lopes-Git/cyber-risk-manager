@@ -56,7 +56,10 @@ export default function Catalogue() {
 
             {/* Main Content - List */}
             <div className="flex-1 flex flex-col p-2 overflow-hidden">
-                <div ref={listRef} className="bg-white border-2 border-[#ACA899] h-full overflow-auto p-1">
+                <div
+                    ref={listRef}
+                    className="bg-white border-2 border-[#ACA899] h-full overflow-auto p-1"
+                >
                     <table className="w-full border-collapse">
                         <thead className="bg-[#ECE9D8] sticky top-0">
                             <tr>
