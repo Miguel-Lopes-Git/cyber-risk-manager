@@ -6,6 +6,7 @@ import { ramModules } from "./ram.js";
 import { powerSupplies } from "./powerSupplies.js";
 import { cases } from "./cases.js";
 import { cpuCoolers } from "./cpuCoolers.js";
+import { rackBays } from "./rackBays.js";
 
 export {
     brands,
@@ -16,4 +17,5 @@ export {
     powerSupplies,
     cases,
     cpuCoolers,
+    rackBays,
 };

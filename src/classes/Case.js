@@ -35,7 +35,36 @@ export default class Case {
         this.model = model;
 
         this.formFactor = formFactor;
-        this.supportedMotherboards = supportedMotherboards;
+        // Si supportedMotherboards n'est pas défini, on l'infère du formFactor
+        if (supportedMotherboards) {
+            this.supportedMotherboards = supportedMotherboards;
+        } else {
+            switch (formFactor) {
+                case "E-ATX":
+                    this.supportedMotherboards = [
+                        "E-ATX",
+                        "ATX",
+                        "Micro-ATX",
+                        "Mini-ITX",
+                    ];
+                    break;
+                case "ATX":
+                    this.supportedMotherboards = [
+                        "ATX",
+                        "Micro-ATX",
+                        "Mini-ITX",
+                    ];
+                    break;
+                case "Micro-ATX":
+                    this.supportedMotherboards = ["Micro-ATX", "Mini-ITX"];
+                    break;
+                case "Mini-ITX":
+                    this.supportedMotherboards = ["Mini-ITX"];
+                    break;
+                default:
+                    this.supportedMotherboards = [];
+            }
+        }
 
         this.gpuMaxLength = gpuMaxLength;
         this.gpuMaxWidthSlots = gpuMaxWidthSlots;

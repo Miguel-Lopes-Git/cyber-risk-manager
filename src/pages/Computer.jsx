@@ -11,21 +11,32 @@ import Player from "@/classes/Player";
 import Folder from "@/components/window/Folder";
 import Mail from "@/components/window/Mail";
 import Catalogue from "@/components/window/Catalogue";
+import ServerWindow from "@/components/window/ServerWindow";
 
 function ComputerContent() {
     // Mettre la page de connexion
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loginError, setLoginError] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [player, setPlayer] = useState(new Player("", 0));
 
-    useEffect(() => {
+    function handleLogin() {
+        // Gérer la logique de connexion ici (à implémenter)
+        if (!username && !password) {
+            setLoginError(
+                "Veuillez entrer un nom d'utilisateur et un mot de passe."
+            );
+            return;
+        }
         // Initialisation du joueur
-        const player = new Player("John Doe", 1000);
-        player.credit(500);
+        player.setName(username);
+        player.credit(5000);
         console.log(
             `Le solde actuel de ${player.name} est de ${player.getSolde()}€.`
         );
-    }, []);
+        setIsLoggedIn(true);
+    }
 
     // Référence à l'écran
     const screenRef = useRef(null);
@@ -85,9 +96,14 @@ function ComputerContent() {
                             placeholder="Mot de passe"
                             className="w-50 h-12 p-2 text-2xl border-4 border-black bg-gray-300 rounded-lg mb-2"
                         />
+                        {loginError && (
+                            <p className="text-red-500 mb-2 text-3xl font-bold">
+                                {loginError}
+                            </p>
+                        )}
                         <button
                             className="w-50 text-2xl cursor-pointer px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            onClick={() => setIsLoggedIn(true)}
+                            onClick={handleLogin}
                         >
                             Se connecter
                         </button>
@@ -138,7 +154,7 @@ function ComputerContent() {
                                 openWindow(
                                     "server",
                                     "Serveur",
-                                    <p>Contenu du serveur</p>,
+                                    <ServerWindow Player={player} />,
                                     "/images/icons/server.png"
                                 )
                             }
@@ -186,7 +202,7 @@ function ComputerContent() {
                             </Window>
                         ))}
                         {/* Footer section */}
-                        <Footer className="row-end-13 col-span-full bg-gray-400" />
+                        <Footer className="z-100 row-end-13 col-span-full bg-gray-400" />
                     </div>
                 )}
             </div>

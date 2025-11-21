@@ -25,6 +25,7 @@ export const cpuCoolers = {
         tdp: 65,
         price: 0,
         sockets: allSockets,
+        height: 50,
     }),
     mad_stock_wraith_stealth: new CpuCooler({
         brand: brands.mad,
@@ -33,6 +34,7 @@ export const cpuCoolers = {
         tdp: 65,
         price: 0,
         sockets: ["AM4", "AM5"],
+        height: 55,
     }),
     mad_stock_wraith_prism: new CpuCooler({
         brand: brands.mad,
@@ -41,6 +43,7 @@ export const cpuCoolers = {
         tdp: 105,
         price: 0,
         sockets: ["AM4", "AM5", "AM3+"],
+        height: 90,
     }),
 
     heater_master_hyper_212: new CpuCooler({
@@ -50,6 +53,7 @@ export const cpuCoolers = {
         tdp: 150,
         price: 30,
         sockets: allSockets,
+        height: 159,
     }),
     heater_master_hyper_212_rgb: new CpuCooler({
         brand: brands.heater_master,
@@ -58,6 +62,7 @@ export const cpuCoolers = {
         tdp: 150,
         price: 40,
         sockets: allSockets,
+        height: 159,
     }),
 
     deepcool_ak400: new CpuCooler({
@@ -67,6 +72,7 @@ export const cpuCoolers = {
         tdp: 180,
         price: 35,
         sockets: modernSockets,
+        height: 155,
     }),
     deepcool_ak620: new CpuCooler({
         brand: brands.deepcool,
@@ -75,6 +81,7 @@ export const cpuCoolers = {
         tdp: 260,
         price: 65,
         sockets: modernSockets,
+        height: 160,
     }),
 
     beloud_pure_rock_2: new CpuCooler({
@@ -84,6 +91,7 @@ export const cpuCoolers = {
         tdp: 150,
         price: 40,
         sockets: modernSockets,
+        height: 155,
     }),
     beloud_dark_rock_pro_4: new CpuCooler({
         brand: brands.beloud,
@@ -92,6 +100,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 90,
         sockets: modernSockets,
+        height: 163,
     }),
 
     owlcool_nh_u12s: new CpuCooler({
@@ -101,6 +110,7 @@ export const cpuCoolers = {
         tdp: 170,
         price: 60,
         sockets: allSockets,
+        height: 158,
     }),
     owlcool_nh_d15: new CpuCooler({
         brand: brands.owlcool,
@@ -109,6 +119,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 100,
         sockets: allSockets,
+        height: 165,
     }),
     owlcool_nh_l9i: new CpuCooler({
         brand: brands.owlcool,
@@ -117,6 +128,7 @@ export const cpuCoolers = {
         tdp: 95,
         price: 45,
         sockets: ["LGA1700", "LGA1200", "LGA115x"],
+        height: 37,
     }), // Low profile
 
     scythe_fuma_2: new CpuCooler({
@@ -126,6 +138,7 @@ export const cpuCoolers = {
         tdp: 200,
         price: 60,
         sockets: modernSockets,
+        height: 155,
     }),
     arctic_freezer_34: new CpuCooler({
         brand: brands.arctic,
@@ -134,6 +147,7 @@ export const cpuCoolers = {
         tdp: 180,
         price: 40,
         sockets: modernSockets,
+        height: 157,
     }),
 
     // =================================================================================================
@@ -148,6 +162,7 @@ export const cpuCoolers = {
         tdp: 150,
         price: 70,
         sockets: allSockets,
+        height: 55,
     }),
     heater_master_ml120l: new CpuCooler({
         brand: brands.heater_master,
@@ -156,6 +171,7 @@ export const cpuCoolers = {
         tdp: 150,
         price: 60,
         sockets: allSockets,
+        height: 55,
     }),
 
     // 240mm
@@ -166,6 +182,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 120,
         sockets: allSockets,
+        height: 55,
     }),
     next_kraken_x53: new CpuCooler({
         brand: brands.next,
@@ -174,6 +191,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 130,
         sockets: modernSockets,
+        height: 55,
     }),
     arctic_liquid_freezer_ii_240: new CpuCooler({
         brand: brands.arctic,
@@ -182,6 +200,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 90,
         sockets: modernSockets,
+        height: 65,
     }),
     deepcool_ls520: new CpuCooler({
         brand: brands.deepcool,
@@ -190,6 +209,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 100,
         sockets: modernSockets,
+        height: 55,
     }),
     lean_lee_galahad_240: new CpuCooler({
         brand: brands.lean_lee,
@@ -198,6 +218,7 @@ export const cpuCoolers = {
         tdp: 250,
         price: 120,
         sockets: modernSockets,
+        height: 60,
     }),
 
     // 280mm
@@ -208,6 +229,7 @@ export const cpuCoolers = {
         tdp: 280,
         price: 140,
         sockets: allSockets,
+        height: 55,
     }),
     next_kraken_x63: new CpuCooler({
         brand: brands.next,
@@ -216,6 +238,7 @@ export const cpuCoolers = {
         tdp: 280,
         price: 150,
         sockets: modernSockets,
+        height: 55,
     }),
     arctic_liquid_freezer_ii_280: new CpuCooler({
         brand: brands.arctic,
@@ -224,6 +247,7 @@ export const cpuCoolers = {
         tdp: 280,
         price: 110,
         sockets: modernSockets,
+        height: 65,
     }),
 
     // 360mm
@@ -234,6 +258,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 180,
         sockets: modernSockets,
+        height: 55,
     }),
     next_kraken_x73: new CpuCooler({
         brand: brands.next,
@@ -242,6 +267,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 180,
         sockets: modernSockets,
+        height: 55,
     }),
     arctic_liquid_freezer_ii_360: new CpuCooler({
         brand: brands.arctic,
@@ -250,6 +276,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 130,
         sockets: modernSockets,
+        height: 65,
     }),
     deepcool_ls720: new CpuCooler({
         brand: brands.deepcool,
@@ -258,6 +285,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 140,
         sockets: modernSockets,
+        height: 55,
     }),
     lean_lee_galahad_360: new CpuCooler({
         brand: brands.lean_lee,
@@ -266,6 +294,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 160,
         sockets: modernSockets,
+        height: 60,
     }),
     mzi_mag_coreliquid_360r: new CpuCooler({
         brand: brands.mzi,
@@ -274,6 +303,7 @@ export const cpuCoolers = {
         tdp: 350,
         price: 130,
         sockets: modernSockets,
+        height: 55,
     }),
 
     // 420mm
@@ -284,6 +314,7 @@ export const cpuCoolers = {
         tdp: 400,
         price: 230,
         sockets: modernSockets,
+        height: 55,
     }),
     arctic_liquid_freezer_ii_420: new CpuCooler({
         brand: brands.arctic,
@@ -292,5 +323,6 @@ export const cpuCoolers = {
         tdp: 400,
         price: 150,
         sockets: modernSockets,
+        height: 65,
     }),
 };

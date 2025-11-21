@@ -7,6 +7,7 @@ import {
     powerSupplies,
     cases,
     cpuCoolers,
+    rackBays,
 } from "@/data/initialData";
 
 const categories = [
@@ -17,6 +18,7 @@ const categories = [
     { id: "powerSupplies", label: "Alimentations", data: powerSupplies },
     { id: "cpuCoolers", label: "Refroidissement", data: cpuCoolers },
     { id: "cases", label: "Boîtiers", data: cases },
+    { id: "rackBays", label: "Baies Rack", data: rackBays },
 ];
 
 export default function Catalogue() {

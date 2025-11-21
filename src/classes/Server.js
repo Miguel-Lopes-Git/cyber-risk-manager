@@ -3,7 +3,7 @@ export default class Server {
         this.processors = [];
         this.cpuCoolers = [];
         this.motherboard = null;
-        this.gpu = null;
+        this.gpus = [];
         this.psu = null;
         this.ram = [];
         this.storage = [];
@@ -19,8 +19,8 @@ export default class Server {
     setMotherboard(mb) {
         this.motherboard = mb;
     }
-    setGPU(gpu) {
-        this.gpu = gpu;
+    addGPU(gpu) {
+        this.gpus.push(gpu);
     }
     setPowerSupply(psu) {
         this.psu = psu;
@@ -41,7 +41,7 @@ export default class Server {
         this.processors.forEach((p) => (total += p.price || 0));
         this.cpuCoolers.forEach((c) => (total += c.price || 0));
         if (this.motherboard) total += this.motherboard.price || 0;
-        if (this.gpu) total += this.gpu.price || 0;
+        this.gpus.forEach((g) => (total += g.price || 0));
         if (this.psu) total += this.psu.price || 0;
         if (this.case) total += this.case.price || 0;
 
@@ -61,7 +61,7 @@ export default class Server {
         const cpus = this.processors;
         const coolers = this.cpuCoolers;
         const mb = this.motherboard;
-        const gpu = this.gpu;
+        const gpus = this.gpus;
         const psu = this.psu;
         const ram = this.ram;
         const storage = this.storage;
@@ -196,23 +196,35 @@ export default class Server {
         }
 
         // ---------------------- GPU <-> Motherboard ----------------------
-        if (gpu && mb) {
-            if (gpu.pcieVersion > mb.pcieVersion)
-                issues.push(
-                    "GPU ↔ Carte mère : PCIe de la carte mère trop ancien."
-                );
+        if (gpus.length > 0 && mb) {
+            gpus.forEach((gpu, index) => {
+                if (gpu.pcieVersion > mb.pcieVersion)
+                    issues.push(
+                        `GPU #${
+                            index + 1
+                        } ↔ Carte mère : PCIe de la carte mère trop ancien.`
+                    );
+            });
 
-            const x16Slot = mb.pcieSlots.find((s) => s.type === "x16");
-            if (!x16Slot)
+            // Check available slots (simplified)
+            // Assuming each GPU takes one x16 slot for now, or check slots
+            const x16Slots = mb.pcieSlots.filter(
+                (s) => s.type === "x16"
+            ).length;
+            if (gpus.length > x16Slots) {
                 issues.push(
-                    "GPU ↔ Carte mère : aucun slot PCIe x16 disponible."
+                    `GPU ↔ Carte mère : pas assez de slots PCIe x16 (${x16Slots} dispos, ${gpus.length} requis).`
                 );
+            }
         }
 
         // ---------------------- GPU <-> PSU ----------------------
-        if (gpu && psu) {
-            if (psu.wattage < gpu.recommendedPSU)
-                issues.push("GPU ↔ PSU : puissance insuffisante pour le GPU.");
+        if (gpus.length > 0 && psu) {
+            gpus.forEach((gpu, index) => {
+                // This check is per GPU vs PSU wattage? No, PSU wattage is total.
+                // Individual check might be for connectors.
+                // We check total power later.
+            });
         }
 
         // ---------------------- PSU total wattage <-> ALL COMPONENTS ----------------------
@@ -220,7 +232,7 @@ export default class Server {
             let totalPower = 0;
 
             cpus.forEach((c) => (totalPower += c.tdp));
-            if (gpu) totalPower += gpu.tdp;
+            gpus.forEach((g) => (totalPower += g.tdp));
             ram.forEach((r) => (totalPower += 5 * r.modules));
             storage.forEach((s) => (totalPower += s.type === "M2" ? 5 : 8));
 
@@ -251,10 +263,14 @@ export default class Server {
 
         // ---------------------- GPU/RAM/Cooler <-> Case (optionnel) ----------------------
         if (this.case) {
-            if (gpu && gpu.length > this.case.gpuMaxLength)
-                issues.push(
-                    "GPU ↔ Boîtier : la carte graphique est trop longue."
-                );
+            gpus.forEach((gpu, index) => {
+                if (gpu.length > this.case.gpuMaxLength)
+                    issues.push(
+                        `GPU #${
+                            index + 1
+                        } ↔ Boîtier : la carte graphique est trop longue.`
+                    );
+            });
 
             ram.forEach((r) => {
                 if (r.height > this.case.maxRamHeight)
