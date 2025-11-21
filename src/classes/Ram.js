@@ -1,17 +1,36 @@
+/**
+ * Représente de la mémoire vive (RAM).
+ */
 export default class RAM {
+    /**
+     * Constructeur de la classe RAM (Mémoire Vive).
+     * @param {Object} params - Les paramètres de la RAM.
+     * @param {string} params.brand - La marque (ex: Corsair, G.Skill, Kingston).
+     * @param {string} params.model - Le modèle de la RAM.
+     * @param {string} params.type - Le type de mémoire (ex: DDR4, DDR5).
+     * @param {number} params.capacity - Capacité par module en Go.
+     * @param {number} params.modules - Nombre de barrettes (ex: 2).
+     * @param {number} params.speed - Fréquence en MHz (ex: 6000).
+     * @param {string} params.timings - Timings de la mémoire (ex: "CL36-36-36-76").
+     * @param {number} params.voltage - Tension en Volts.
+     * @param {boolean} params.ecc - Support ECC (Error Correction Code).
+     * @param {boolean} params.rgb - Présence d'éclairage RGB.
+     * @param {number} params.height - Hauteur en mm (utile pour la compatibilité avec les ventirads).
+     * @param {number} params.price - Prix de la RAM en €.
+     */
     constructor({
-        brand, // Corsair, G.Skill, Kingston, etc.
+        brand,
         model,
-        type, // DDR4, DDR5, LPDDR5, etc.
-        capacity, // Capacite par module en Go
-        modules, // Nombre de barrettes (ex: 2)
-        speed, // Fréquence en MHz (ex: 6000)
-        timings, // "CL36-36-36-76"
-        voltage, // en Volts
-        ecc = false, // ECC ou non
-        rgb = false, // True/false
-        height = null, // Hauteur en mm (utile pour gros ventirads)
-        price = 0, // Prix en €
+        type,
+        capacity,
+        modules,
+        speed,
+        timings,
+        voltage,
+        ecc = false,
+        rgb = false,
+        height = null,
+        price = 0,
     }) {
         this.brand = brand;
         this.model = model;
@@ -27,22 +46,29 @@ export default class RAM {
         this.price = price;
     }
 
-    // Capacité totale (Go)
+    /**
+     * Calcule la capacité totale de la mémoire (capacité par module * nombre de modules).
+     * @returns {number} - Capacité totale en Go.
+     */
     totalCapacity() {
         return this.capacity * this.modules;
     }
 
-    // Vérification compatibilité avec une carte mère
+    /**
+     * Vérifie la compatibilité avec une carte mère donnée.
+     * @param {Object} motherboard - La carte mère à vérifier.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     isCompatibleWithMotherboard(motherboard) {
         if (!motherboard) return false;
 
-        // Type DDR
+        // Vérification du type de mémoire (DDR4, DDR5...)
         if (this.type !== motherboard.memoryType) return false;
 
-        // Vitesse compatible (on accepte <= max)
+        // Vérification de la vitesse (on accepte si <= max supporté par la CM)
         if (this.speed > motherboard.memorySpeed) return false;
 
-        // Nombre de slots
+        // Vérification du nombre de slots disponibles
         if (this.modules > motherboard.memorySlots) return false;
 
         return true;

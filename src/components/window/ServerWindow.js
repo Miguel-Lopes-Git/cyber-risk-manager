@@ -10,7 +10,15 @@ import {
 } from "@/data/initialData";
 import Server from "@/classes/Server";
 
-// Composant interne pour le constructeur de serveur
+/**
+ * Composant interne pour l'interface de construction de serveur.
+ * Permet de sélectionner les composants et de valider la configuration.
+ * @param {Object} props - Les propriétés du composant.
+ * @param {Function} props.onCancel - Fonction appelée pour annuler la construction.
+ * @param {Function} props.onComplete - Fonction appelée pour valider la construction.
+ * @param {number} props.initialSlot - Le slot U de départ sélectionné.
+ * @param {number} props.playerBalance - Le solde actuel du joueur.
+ */
 function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
     const [config, setConfig] = useState({
         case: null,
@@ -24,7 +32,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
 
     const [showSelector, setShowSelector] = useState(null); // 'case', 'motherboard', etc.
 
-    // Calcul du prix total
+    // Calcul du prix total de la configuration
     const totalPrice = Object.entries(config).reduce((sum, [key, item]) => {
         if (Array.isArray(item)) {
             return sum + item.reduce((s, i) => s + i.price, 0);
@@ -32,16 +40,16 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
         return sum + (item ? item.price : 0);
     }, 0);
 
-    // Gestion de la sélection
+    // Gestion de la sélection des composants
     const handleSelect = (type, item) => {
         setConfig((prev) => {
             const newConfig = { ...prev };
 
             if (type === "ram") {
-                // Vérifier si on peut ajouter de la RAM (limite slots CM)
+                // Vérifie si l'ajout de RAM est possible (limite de slots de la carte mère)
                 if (prev.motherboard) {
-                    // On suppose 1 item = 1 slot pour simplifier, ou on regarde item.modules
-                    // Si item.modules n'existe pas, on compte 1.
+                    // Suppose 1 item = 1 slot par défaut, sinon utilise item.modules
+                    // Compte 1 slot si non spécifié
                     const currentSlotsUsed = prev.ram.reduce(
                         (acc, r) => acc + (r.modules || 1),
                         0
@@ -60,7 +68,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                 }
                 newConfig.ram = [...prev.ram, item];
             } else if (type === "gpu") {
-                // Vérifier slots PCIe (simplifié)
+                // Vérifie la disponibilité des slots PCIe (simplifié)
                 if (prev.motherboard) {
                     const x16Slots = prev.motherboard.pcieSlots.filter(
                         (s) => s.type === "x16"
@@ -76,7 +84,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             } else {
                 newConfig[type] = item;
 
-                // Réinitialiser les dépendances si nécessaire
+                // Réinitialise les composants dépendants si nécessaire
                 if (type === "case") {
                     newConfig.motherboard = null;
                     newConfig.cpu = null;
@@ -97,13 +105,13 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             return newConfig;
         });
 
-        // On ne ferme pas le sélecteur pour RAM et GPU pour permettre d'en ajouter plusieurs
+        // Maintient le sélecteur ouvert pour RAM et GPU (sélection multiple)
         if (type !== "ram" && type !== "gpu") {
             setShowSelector(null);
         }
     };
 
-    // Fonction pour retirer un item (RAM/GPU)
+    // Retire un composant de la liste (RAM/GPU)
     const handleRemove = (type, index) => {
         setConfig((prev) => {
             const newConfig = { ...prev };
@@ -114,7 +122,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
         });
     };
 
-    // Filtrage des composants
+    // Filtre les composants compatibles
     const getFilteredItems = (type) => {
         switch (type) {
             case "case":
@@ -143,13 +151,13 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                 );
             case "gpu":
                 if (!config.motherboard || !config.case) return [];
-                // Vérifier longueur max boîtier
+                // Vérifie la compatibilité avec la longueur maximale du boîtier
                 return Object.values(graphicsCards).filter(
                     (g) => g.length <= config.case.gpuMaxLength
                 );
             case "psu":
                 if (!config.case) return [];
-                // Vérifier longueur max PSU
+                // Vérifie la compatibilité avec la longueur maximale de l'alimentation
                 return Object.values(powerSupplies).filter((p) =>
                     config.case.psuMaxLength
                         ? p.length <= config.case.psuMaxLength
@@ -186,7 +194,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             alert("Fonds insuffisants !");
             return;
         }
-        // Vérification finale (simplifiée, on suppose que les filtres ont fait le job)
+        // Vérification finale avant achat (suppose que les filtres ont fonctionné)
         if (
             !config.case ||
             !config.motherboard ||
@@ -204,7 +212,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
 
     return (
         <div className="absolute inset-0 bg-[#ECE9D8] z-50 flex flex-col p-1 font-sans">
-            {/* Header style XP */}
+            {/* En-tête style Windows XP */}
             <div className="bg-linear-to-r from-[#0058EE] to-[#3593FF] p-2 flex justify-between items-center rounded-t-lg border-b-2 border-[#003C74]">
                 <h2 className="text-2xl font-bold text-white drop-shadow-md">
                     Configurateur de Serveur (Slot U{initialSlot})
@@ -218,7 +226,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             </div>
 
             <div className="flex-1 flex overflow-hidden bg-[#ECE9D8] p-2 gap-2">
-                {/* Sidebar Tabs style XP */}
+                {/* Onglets latéraux style Windows XP */}
                 <div className="w-1/3 flex flex-col gap-2 overflow-auto pr-2">
                     {[
                         { id: "case", label: "Boîtier" },
@@ -316,7 +324,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                     ))}
                 </div>
 
-                {/* Main Content Area (Selector) */}
+                {/* Zone principale (Sélecteur de composants) */}
                 <div className="flex-1 bg-white border-2 border-[#ACA899] shadow-inner p-4 overflow-auto relative">
                     {showSelector ? (
                         <div className="h-full flex flex-col">
@@ -410,7 +418,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                 </div>
             </div>
 
-            {/* Footer Actions */}
+            {/* Actions du pied de page (Total et Achat) */}
             <div className="mt-2 border-t-2 border-[#ACA899] pt-2 flex justify-between items-center bg-[#ECE9D8] p-2">
                 <div className="text-2xl font-bold text-[#0B318F]">
                     Total:{" "}
@@ -444,15 +452,21 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
     );
 }
 
+/**
+ * Composant ServerWindow (Fenêtre de gestion du serveur).
+ * Affiche le rack du joueur et permet d'ajouter/configurer des serveurs.
+ * @param {Object} props - Les propriétés du composant.
+ * @param {Player} props.Player - L'instance du joueur connecté.
+ */
 export default function ServerWindow({ Player }) {
-    // Recharger le rendu lorsqu'une action modifie l'état du joueur
+    // Force le re-rendu lors d'une modification de l'état du joueur
     const [, setRender] = useState(0);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isConfiguring, setIsConfiguring] = useState(false);
 
     const forceUpdate = () => setRender((prev) => prev + 1);
 
-    // Vérifier si le joueur est défini
+    // Vérifie si un joueur est connecté
     if (!Player) {
         return (
             <div className="p-4">
@@ -466,7 +480,7 @@ export default function ServerWindow({ Player }) {
     const totalU = rackBay.totalU;
 
     const handleSlotClick = (u) => {
-        // Si le slot est occupé, on ne fait rien pour l'instant
+        // Si le slot est occupé, affiche les infos du serveur installé
         if (rackBay.getCaseAt(u)) {
             const installed = rackBay.getCaseAt(u);
             alert(
@@ -480,7 +494,7 @@ export default function ServerWindow({ Player }) {
 
     const handleBuildComplete = (config, totalPrice) => {
         try {
-            // Créer le serveur
+            // Instancie un nouveau serveur
             const newServer = new Server();
             newServer.setCase(config.case);
             newServer.setMotherboard(config.motherboard);
@@ -492,13 +506,13 @@ export default function ServerWindow({ Player }) {
 
             newServer.setPowerSupply(config.psu);
 
-            // Ajouter au rack
+            // Ajoute le serveur au rack
             rackBay.addCase(config.case, selectedSlot);
 
-            // Débiter le joueur
+            // Débite le coût du serveur au joueur
             Player.debit(totalPrice);
 
-            // Reset UI
+            // Réinitialise l'interface utilisateur
             setIsConfiguring(false);
             setSelectedSlot(null);
             forceUpdate();
@@ -509,7 +523,7 @@ export default function ServerWindow({ Player }) {
 
     const handleUpgradeRack = () => {
         try {
-            // Prix arbitraire pour l'upgrade : 100€ par 2U supplémentaires
+            // Coût de l'amélioration : 100€ pour 2U supplémentaires
             const upgradeCost = 100;
             if (Player.getSolde() < upgradeCost) {
                 alert("Fonds insuffisants pour agrandir le rack.");
@@ -522,19 +536,19 @@ export default function ServerWindow({ Player }) {
         }
     };
 
-    // Générer les slots d'affichage
+    // Génère l'affichage des slots du rack
     const renderSlots = () => {
         const slots = [];
-        // On parcourt de 1 à totalU
+        // Parcourt tous les slots de 1 à totalU
         for (let u = 1; u <= totalU; u++) {
             const installedCase = rackBay.getCaseAt(u);
 
             if (installedCase) {
                 if (installedCase.startU === u) {
-                    // C'est le début du boîtier
+                    // Début d'un boîtier installé
                     const heightStyle = {
                         height: `${installedCase.component.sizeU * 40}px`,
-                    }; // Augmenté à 40px par U pour lisibilité
+                    }; // Hauteur ajustée à 40px par U pour une meilleure lisibilité
                     slots.push(
                         <div
                             key={u}
@@ -556,7 +570,7 @@ export default function ServerWindow({ Player }) {
                         </div>
                     );
                 }
-                // Sauter les slots occupés par ce boîtier
+                // Saute les slots occupés par ce boîtier
                 u += installedCase.component.sizeU - 1;
             } else {
                 // Slot vide
@@ -605,7 +619,7 @@ export default function ServerWindow({ Player }) {
             </div>
 
             <div className="flex-1 overflow-auto border-4 border-gray-600 bg-gray-800 p-6 rounded-lg shadow-inner">
-                {/* Rack visualization */}
+                {/* Visualisation du rack */}
                 <div className="bg-gray-900 p-4 w-full max-w-3xl mx-auto border-x-8 border-gray-700 min-h-[300px] shadow-2xl">
                     {renderSlots()}
                 </div>

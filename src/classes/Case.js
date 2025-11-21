@@ -1,41 +1,68 @@
+/**
+ * Représente un boîtier d'ordinateur (PC Case).
+ */
 export default class Case {
+    /**
+     * Constructeur de la classe Case (Boîtier).
+     * @param {Object} params - Les paramètres du boîtier.
+     * @param {string} params.brand - La marque du boîtier.
+     * @param {string} params.model - Le modèle du boîtier.
+     * @param {string} params.formFactor - Le format du boîtier (ex: ATX, Micro-ATX, Mini-ITX, E-ATX).
+     * @param {string[]} params.supportedMotherboards - Liste des formats de cartes mères supportés (ex: ["ATX", "Micro-ATX"]).
+     * @param {number} params.gpuMaxLength - Longueur maximale de la carte graphique en mm.
+     * @param {number} params.gpuMaxWidthSlots - Nombre de slots maximum pour la carte graphique (ex: 2.5, 3).
+     * @param {number} params.cpuCoolerMaxHeight - Hauteur maximale du ventirad CPU en mm.
+     * @param {number} params.psuMaxLength - Longueur maximale de l'alimentation en mm.
+     * @param {number} params.driveBays35 - Nombre de baies 3.5" (pour disques durs HDD).
+     * @param {number} params.driveBays25 - Nombre de baies 2.5" (pour SSD SATA).
+     * @param {Object[]} params.frontFans - Ventilateurs avant inclus (ex: [{ size: 120, count: 2 }]).
+     * @param {Object[]} params.topFans - Ventilateurs supérieurs inclus.
+     * @param {Object[]} params.rearFans - Ventilateurs arrière inclus.
+     * @param {Object[]} params.bottomFans - Ventilateurs inférieurs inclus.
+     * @param {number[]} params.radiatorSupport - Tailles de radiateurs watercooling supportées (ex: [120, 240, 360]).
+     * @param {number} params.cableManagementSpace - Espace disponible pour le câble management en mm.
+     * @param {boolean} params.hasPsuShroud - Indique si un cache alimentation est présent.
+     * @param {number} params.maxRamHeight - Hauteur maximale de la RAM en mm (par sécurité).
+     * @param {number} params.sizeU - Taille en unités de rack (U) pour les boîtiers serveurs.
+     * @param {number} params.price - Prix du boîtier en €.
+     */
     constructor({
         brand,
         model,
 
-        formFactor, // ATX, Micro-ATX, Mini-ITX, E-ATX
-        supportedMotherboards, // ["ATX", "Micro-ATX", "Mini-ITX"]
+        formFactor,
+        supportedMotherboards,
 
-        gpuMaxLength, // longueur max GPU en mm
-        gpuMaxWidthSlots, // nombre de slots max (2.5, 3)
+        gpuMaxLength,
+        gpuMaxWidthSlots,
 
-        cpuCoolerMaxHeight, // hauteur max ventirad en mm
+        cpuCoolerMaxHeight,
 
-        psuMaxLength, // taille max PSU (en mm)
+        psuMaxLength,
 
-        driveBays35, // nombre de baies 3.5" (HDD)
-        driveBays25, // nombre de baies 2.5" (SSD SATA)
+        driveBays35,
+        driveBays25,
 
-        frontFans = [], // [{ size: 120, count: 2 }]
+        frontFans = [],
         topFans = [],
         rearFans = [],
         bottomFans = [],
 
-        radiatorSupport = [], // support watercooling : [120, 240, 360]
+        radiatorSupport = [],
 
-        cableManagementSpace, // espace derrière le panneau (mm)
-        hasPsuShroud, // cache alimentation oui/non
+        cableManagementSpace,
+        hasPsuShroud,
 
-        maxRamHeight = 60, // par sécurité
+        maxRamHeight = 60,
 
-        sizeU = 2, // Taille en U pour boîtiers serveurs
-        price = 0, // Prix en €
+        sizeU = 2,
+        price = 0,
     }) {
         this.brand = brand;
         this.model = model;
 
         this.formFactor = formFactor;
-        // Si supportedMotherboards n'est pas défini, on l'infère du formFactor
+        // Si la liste des cartes mères supportées n'est pas définie, on la déduit du format du boîtier (formFactor)
         if (supportedMotherboards) {
             this.supportedMotherboards = supportedMotherboards;
         } else {
@@ -92,7 +119,11 @@ export default class Case {
         this.price = price;
     }
 
-    // Vérifie compatibilité boîtier <-> GPU
+    /**
+     * Vérifie la compatibilité entre le boîtier et la carte graphique (GPU).
+     * @param {Object} gpu - L'objet carte graphique à vérifier.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     fitsGPU(gpu) {
         if (!gpu) return true;
         if (this.gpuMaxLength && gpu.length > this.gpuMaxLength) return false;
@@ -101,24 +132,40 @@ export default class Case {
         return true;
     }
 
-    // Compatibilité boîtier <-> PSU
+    /**
+     * Vérifie la compatibilité entre le boîtier et l'alimentation (PSU).
+     * @param {Object} psu - L'objet alimentation à vérifier.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     fitsPSU(psu) {
         if (!psu || !this.psuMaxLength) return true;
         return psu.length <= this.psuMaxLength;
     }
 
-    // Compatibilité boîtier <-> Carte mère
+    /**
+     * Vérifie la compatibilité entre le boîtier et la carte mère.
+     * @param {Object} mb - L'objet carte mère à vérifier.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     fitsMotherboard(mb) {
         if (!mb) return true;
         return this.supportedMotherboards.includes(mb.formFactor);
     }
 
-    // Compatibilité boîtier <-> Ventirad CPU
+    /**
+     * Vérifie la compatibilité entre le boîtier et le ventirad CPU.
+     * @param {number} coolerHeight - La hauteur du ventirad en mm.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     fitsCPUCooler(coolerHeight) {
         return coolerHeight <= this.cpuCoolerMaxHeight;
     }
 
-    // Compatibilité boîtier <-> RAM
+    /**
+     * Vérifie la compatibilité entre le boîtier et la mémoire RAM (hauteur).
+     * @param {Object} module - L'objet module de RAM à vérifier.
+     * @returns {boolean} - Retourne true si compatible, sinon false.
+     */
     fitsRAM(module) {
         return module.height <= this.maxRamHeight;
     }

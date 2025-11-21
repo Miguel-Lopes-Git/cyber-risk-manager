@@ -13,23 +13,33 @@ import Mail from "@/components/window/Mail";
 import Catalogue from "@/components/window/Catalogue";
 import ServerWindow from "@/components/window/ServerWindow";
 
+/**
+ * Composant principal du contenu de l'ordinateur.
+ * Gère l'écran de connexion, le bureau, les icônes et les fenêtres.
+ *
+ * @returns {JSX.Element} Le contenu de l'interface de l'ordinateur.
+ */
 function ComputerContent() {
-    // Mettre la page de connexion
+    // États pour la gestion de la connexion et du joueur
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginError, setLoginError] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [player, setPlayer] = useState(new Player("", 0));
 
+    /**
+     * Gère la tentative de connexion de l'utilisateur.
+     * Vérifie les champs et initialise le joueur.
+     */
     function handleLogin() {
-        // Gérer la logique de connexion ici (à implémenter)
+        // Vérification basique des champs
         if (!username && !password) {
             setLoginError(
                 "Veuillez entrer un nom d'utilisateur et un mot de passe."
             );
             return;
         }
-        // Initialisation du joueur
+        // Initialisation du joueur avec un solde de départ
         player.setName(username);
         player.credit(5000);
         console.log(
@@ -38,24 +48,27 @@ function ComputerContent() {
         setIsLoggedIn(true);
     }
 
-    // Référence à l'écran
+    // Référence à l'élément DOM de l'écran pour l'effet CRT
     const screenRef = useRef(null);
+    // Utilisation du contexte des fenêtres pour gérer l'ouverture/fermeture
     const { windows, openWindow } = useWindows();
 
+    /**
+     * Effet pour initialiser l'effet CRT et gérer le menu contextuel.
+     */
     useEffect(() => {
         if (typeof window !== "undefined" && screenRef.current) {
             const screen = initScreenEffect("#screen");
 
-            // Désactiver le menu contextuel du navigateur
+            // Désactive le menu contextuel par défaut du navigateur pour une immersion totale
             const handleContextMenu = (e) => {
                 e.preventDefault();
             };
 
             document.addEventListener("contextmenu", handleContextMenu);
 
-            // Cleanup function
+            // Nettoyage lors du démontage du composant
             return () => {
-                // Clean up the screen effect if needed
                 if (screen && screen.nodes && screen.nodes.container) {
                     screen.nodes.container.remove();
                 }
@@ -67,6 +80,7 @@ function ComputerContent() {
     return (
         <>
             <div id="screen" ref={screenRef}>
+                {/* Écran de connexion */}
                 {!isLoggedIn && (
                     <div className="absolute top-0 left-0 w-full h-full bg-opacity-80 z-50 flex flex-col justify-center items-center">
                         <Image
@@ -110,6 +124,7 @@ function ComputerContent() {
                     </div>
                 )}
 
+                {/* Bureau (affiché une fois connecté) */}
                 {isLoggedIn && (
                     <div
                         className="w-full h-full relative z-10 grid gap-0 p-2"
@@ -118,8 +133,7 @@ function ComputerContent() {
                             gridTemplateRows: "repeat(12, 1fr)",
                         }}
                     >
-                        {/* Grid section */}
-                        {/* Icone section */}
+                        {/* Section des icônes du bureau */}
                         <Icon
                             className="row-start-2 row-span-2 col-start-2 col-span-2"
                             imagePath={"/images/icons/folder.png"}
@@ -185,7 +199,7 @@ function ComputerContent() {
                                 )
                             }
                         />
-                        {/* Render all windows */}
+                        {/* Rendu de toutes les fenêtres ouvertes */}
                         {windows.map((window) => (
                             <Window
                                 key={window.id}
@@ -201,7 +215,7 @@ function ComputerContent() {
                                 {window.content}
                             </Window>
                         ))}
-                        {/* Footer section */}
+                        {/* Barre des tâches (Footer) */}
                         <Footer className="z-100 row-end-13 col-span-full bg-gray-400" />
                     </div>
                 )}
@@ -210,6 +224,12 @@ function ComputerContent() {
     );
 }
 
+/**
+ * Page principale de l'ordinateur.
+ * Enveloppe le contenu dans le fournisseur de contexte des fenêtres.
+ *
+ * @returns {JSX.Element} La page Computer.
+ */
 export default function Computer() {
     return (
         <WindowProvider>

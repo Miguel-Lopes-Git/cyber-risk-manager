@@ -1,5 +1,9 @@
 import RackBay from "./RackBay.js";
 
+/**
+ * Représente un joueur dans le jeu.
+ * Gère le solde, le nom et la baie de serveurs du joueur.
+ */
 export default class Player {
     // Attributs publics
     name = "";
@@ -13,21 +17,37 @@ export default class Player {
         price: 0,
     });
 
+    /**
+     * Constructeur de la classe Player (Joueur).
+     * @param {string} name - Le nom du joueur.
+     * @param {number} soldeInitial - Le solde initial du joueur.
+     */
     constructor(name, soldeInitial) {
         this.name = name;
         this.#solde = soldeInitial;
     }
 
+    /**
+     * Définit le nom du joueur.
+     * @param {string} name - Le nouveau nom.
+     */
     setName(name) {
         this.name = name;
     }
 
-    // Méthode pour obtenir le solde actuel
+    /**
+     * Récupère le solde actuel du joueur.
+     * @returns {number} - Le solde actuel.
+     */
     getSolde() {
         return this.#solde;
     }
 
-    // Méthode pour créditer le compte du joueur
+    /**
+     * Crédite le compte du joueur d'un certain montant.
+     * @param {number} amount - Le montant à ajouter.
+     * @throws {Error} - Si le montant est négatif ou nul.
+     */
     credit(amount) {
         if (amount > 0) {
             this.#solde += amount;
@@ -36,7 +56,11 @@ export default class Player {
         }
     }
 
-    // Méthode pour débiter le compte du joueur
+    /**
+     * Débite le compte du joueur d'un certain montant.
+     * @param {number} amount - Le montant à retirer.
+     * @throws {Error} - Si le montant est négatif ou si les fonds sont insuffisants.
+     */
     debit(amount) {
         if (amount > 0) {
             if (amount <= this.#solde) {
@@ -49,12 +73,19 @@ export default class Player {
         }
     }
 
-    // Récupérer la baie du joueur
+    /**
+     * Récupère la baie (RackBay) du joueur.
+     * @returns {RackBay} - L'objet RackBay du joueur.
+     */
     getRackBay() {
         return this.#rackBay;
     }
 
-    // Améliorer la baie (ajouter des U)
+    /**
+     * Améliore la baie du joueur en ajoutant des unités (U).
+     * @param {number} additionalU - Nombre d'unités à ajouter.
+     * @param {number} cost - Coût de l'amélioration.
+     */
     upgradeRackBay(additionalU, cost) {
         this.debit(cost);
         this.#rackBay.upgrade(additionalU);

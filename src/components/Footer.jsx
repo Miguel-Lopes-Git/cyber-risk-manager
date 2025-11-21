@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useWindows } from "@/contexts/WindowContext";
 import Image from "next/image";
 
+/**
+ * Composant Footer (Barre des tâches).
+ * Affiche les fenêtres ouvertes, le menu contextuel, la météo et l'heure.
+ * @param {Object} props - Les propriétés du composant.
+ * @param {string} props.className - Classes CSS supplémentaires.
+ */
 export default function Footer({ className }) {
     const [currentWeather, setCurrentWeather] = useState("");
     const [contextMenu, setContextMenu] = useState(null);
@@ -33,7 +39,7 @@ export default function Footer({ className }) {
     }, []);
 
     useEffect(() => {
-        // Fetch current weather data from a weather API
+        // Récupère les données météo actuelles depuis une API
         async function fetchWeather() {
             try {
                 const response = await fetch(
@@ -66,7 +72,7 @@ export default function Footer({ className }) {
                     minute: "numeric",
                 })
             );
-        }, 10000); // Met à jour toutes les 10 secondes
+        }, 10000); // Met à jour l'heure toutes les 10 secondes
 
         return () => clearInterval(interval);
     }, []);
@@ -77,7 +83,7 @@ export default function Footer({ className }) {
                 "flex justify-between pt-4 px-8 select-none " + className
             }
         >
-            {/* Start menu and open windows */}
+            {/* Menu Démarrer et fenêtres ouvertes */}
             <div className="flex gap-2 items-center relative">
                 {windows.map((window) => (
                     <button
@@ -100,7 +106,7 @@ export default function Footer({ className }) {
                     </button>
                 ))}
 
-                {/* Context Menu */}
+                {/* Menu contextuel */}
                 {contextMenu && (
                     <div
                         className="fixed bg-white border-2 border-gray-300 rounded shadow-lg z-50"
@@ -122,16 +128,16 @@ export default function Footer({ className }) {
                 )}
             </div>
 
-            {/* Right information */}
+            {/* Informations de droite (Météo, Heure) */}
             <div className="flex gap-6">
-                {/* Weather */}
+                {/* Météo */}
                 <div>
                     <span className="text-3xl px-3 py-2 bg-gray-300 rounded-lg">
                         {currentWeather || "00°C"}
                     </span>
                 </div>
 
-                {/* Time */}
+                {/* Heure */}
                 <div>
                     <span className="text-3xl px-3 py-2 bg-gray-300 rounded-lg">
                         {currentTime}

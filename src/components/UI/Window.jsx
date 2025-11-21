@@ -3,6 +3,19 @@ import Draggable from "react-draggable";
 import { useRef, useEffect, useState } from "react";
 import { useWindows } from "@/contexts/WindowContext";
 
+/**
+ * Composant Window représentant une fenêtre draggable et redimensionnable.
+ * @param {Object} props - Les propriétés de la fenêtre.
+ * @param {string} props.id - L'identifiant unique de la fenêtre.
+ * @param {string} props.title - Le titre de la fenêtre.
+ * @param {string} props.className - Classes CSS supplémentaires.
+ * @param {React.ReactNode} props.children - Le contenu de la fenêtre.
+ * @param {boolean} props.isMinimized - Si la fenêtre est minimisée.
+ * @param {boolean} props.isMaximized - Si la fenêtre est maximisée.
+ * @param {number} props.zIndex - L'index Z de la fenêtre.
+ * @param {Object} props.position - La position {x, y} de la fenêtre.
+ * @param {Object} props.size - La taille {width, height} de la fenêtre.
+ */
 export default function Window({
     id,
     title,
@@ -22,14 +35,14 @@ export default function Window({
         bottom: 0,
     });
     const [isResizing, setIsResizing] = useState(false);
-    const [resizeDirection, setResizeDirection] = useState(null); // 'right', 'bottom', 'corner'
+    const [resizeDirection, setResizeDirection] = useState(null); // Direction du redimensionnement : 'right', 'bottom', 'corner'
     const [resizeStart, setResizeStart] = useState({
         x: 0,
         y: 0,
         width: 0,
         height: 0,
     });
-    const minSize = { width: 384, height: 384 }; // Taille minimale (w-96 h-96)
+    const minSize = { width: 384, height: 384 }; // Taille minimale de la fenêtre (384x384 px)
 
     const {
         closeWindow,
@@ -49,7 +62,7 @@ export default function Window({
                 const screenRect = screenElement.getBoundingClientRect();
                 const windowRect = windowElement.getBoundingClientRect();
 
-                // Calculer les limites pour que la fenêtre ne puisse sortir que de la moitié max
+                // Calcule les limites de déplacement pour empêcher la fenêtre de sortir complètement de l'écran
                 setBounds({
                     left: -windowRect.width / 2,
                     top: 0,
@@ -59,14 +72,14 @@ export default function Window({
             }
         };
 
-        // Mettre à jour les limites au montage et lors du redimensionnement
+        // Met à jour les limites lors du montage et du redimensionnement de la fenêtre
         updateBounds();
         window.addEventListener("resize", updateBounds);
 
         return () => window.removeEventListener("resize", updateBounds);
     }, [isMaximized, size]);
 
-    // Gestion du redimensionnement
+    // Gestionnaire de redimensionnement de la fenêtre
     useEffect(() => {
         const handleMouseMove = (e) => {
             if (!isResizing) return;
@@ -76,7 +89,7 @@ export default function Window({
 
             const screenRect = screenElement.getBoundingClientRect();
             const maxWidth = screenRect.width;
-            const maxHeight = screenRect.height - 64; // Moins la hauteur du footer (4rem = 64px)
+            const maxHeight = screenRect.height - 64; // Soustrait la hauteur du footer (64px)
 
             const deltaX = e.clientX - resizeStart.x;
             const deltaY = e.clientY - resizeStart.y;
@@ -84,7 +97,7 @@ export default function Window({
             let newWidth = resizeStart.width;
             let newHeight = resizeStart.height;
 
-            // Redimensionner selon la direction
+            // Applique le redimensionnement en fonction de la direction
             if (resizeDirection === "right" || resizeDirection === "corner") {
                 newWidth = Math.max(minSize.width, resizeStart.width + deltaX);
                 newWidth = Math.min(newWidth, maxWidth);
@@ -163,7 +176,7 @@ export default function Window({
                 }}
                 onMouseDown={() => bringToFront(id)}
             >
-                {/* Window controls */}
+                {/* Contrôles de la fenêtre (Réduire, Agrandir, Fermer) */}
                 <div
                     className={`w-full h-10 bg-blue-500 flex justify-between items-center header cursor-move ${
                         isMaximized ? " px-8" : "px-2"
@@ -207,7 +220,7 @@ export default function Window({
                     </div>
                 </div>
 
-                {/* Window content */}
+                {/* Contenu de la fenêtre */}
                 <div
                     className={`bg-[#e0dbba] w-full overflow-auto ${
                         isMaximized ? "px-6" : ""
@@ -218,22 +231,22 @@ export default function Window({
                     {children}
                 </div>
 
-                {/* Resize handles */}
+                {/* Poignées de redimensionnement */}
                 {!isMaximized && (
                     <>
-                        {/* Bord droit - redimensionner la largeur */}
+                        {/* Bord droit : redimensionnement horizontal */}
                         <div
                             className="absolute top-0 right-0 w-1 h-full cursor-ew-resize"
                             onMouseDown={(e) => handleResizeStart(e, "right")}
                         />
 
-                        {/* Bord bas - redimensionner la hauteur */}
+                        {/* Bord bas : redimensionnement vertical */}
                         <div
                             className="absolute bottom-0 left-0 w-full h-1 cursor-ns-resize"
                             onMouseDown={(e) => handleResizeStart(e, "bottom")}
                         />
 
-                        {/* Coin inférieur droit - redimensionner largeur et hauteur */}
+                        {/* Coin inférieur droit : redimensionnement diagonal */}
                         <div
                             className="absolute bottom-0 right-0 w-2 h-2 cursor-se-resize"
                             onMouseDown={(e) => handleResizeStart(e, "corner")}

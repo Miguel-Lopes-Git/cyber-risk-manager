@@ -1,10 +1,24 @@
+/**
+ * Génère un nombre entier aléatoire entre min et max (inclus).
+ * @param {number} min - La valeur minimale.
+ * @param {number} max - La valeur maximale.
+ * @returns {number} Un entier aléatoire.
+ */
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * Classe gérant les effets d'écran (CRT, scanlines, bruit, etc.).
+ */
 class ScreenEffect {
+    /**
+     * Crée une instance de ScreenEffect.
+     * @param {HTMLElement|string} parent - L'élément parent ou son sélecteur.
+     * @param {Object} options - Les options de configuration.
+     */
     constructor(parent, options) {
         this.parent = parent;
         if (typeof parent === "string") {
@@ -14,7 +28,7 @@ class ScreenEffect {
         this.config = Object.assign(
             {},
             {
-                //
+                // Options par défaut
             },
             options
         );
@@ -30,6 +44,9 @@ class ScreenEffect {
         this.render();
     }
 
+    /**
+     * Initialise la structure DOM pour les effets.
+     */
     render() {
         const container = document.createElement("div");
         container.classList.add("screen-container");
@@ -56,6 +73,10 @@ class ScreenEffect {
         this.onResize();
     }
 
+    /**
+     * Gère le redimensionnement de la fenêtre.
+     * @param {Event} e - L'événement de redimensionnement.
+     */
     onResize(e) {
         this.rect = this.parent.getBoundingClientRect();
 
@@ -64,6 +85,12 @@ class ScreenEffect {
         }
     }
 
+    /**
+     * Ajoute un effet à l'écran.
+     * @param {string|string[]} type - Le type d'effet (ou tableau de types).
+     * @param {Object} options - Les options spécifiques à l'effet.
+     * @returns {ScreenEffect} L'instance courante pour le chaînage.
+     */
     add(type, options) {
         const config = Object.assign(
             {},
@@ -188,6 +215,11 @@ class ScreenEffect {
         return this;
     }
 
+    /**
+     * Supprime un effet.
+     * @param {string} type - Le type d'effet à supprimer.
+     * @returns {ScreenEffect} L'instance courante.
+     */
     remove(type) {
         const obj = this.effects[type];
         if (type in this.effects && !!obj.enabled) {
@@ -215,6 +247,9 @@ class ScreenEffect {
         return this;
     }
 
+    /**
+     * Active l'effet de défilement vertical (roll).
+     */
     enableRoll() {
         const el = this.parent.firstElementChild;
 
@@ -239,6 +274,9 @@ class ScreenEffect {
         }
     }
 
+    /**
+     * Génère le bruit VCR (tracking noise).
+     */
     generateVCRNoise() {
         const canvas = this.effects.vcr.node;
         const config = this.effects.vcr.config;
@@ -260,7 +298,10 @@ class ScreenEffect {
         }
     }
 
-    // Generate CRT noise
+    /**
+     * Génère de la neige (bruit blanc) sur le canvas.
+     * @param {CanvasRenderingContext2D} ctx - Le contexte 2D du canvas.
+     */
     generateSnow(ctx) {
         var w = ctx.canvas.width,
             h = ctx.canvas.height,
@@ -275,6 +316,12 @@ class ScreenEffect {
         ctx.putImageData(d, 0, 0);
     }
 
+    /**
+     * Rend le bruit de tracking VCR.
+     * @param {number} radius - Rayon des artefacts.
+     * @param {number} xmax - Largeur max.
+     * @param {number} ymax - Hauteur max.
+     */
     renderTrackingNoise(radius = 2, xmax, ymax) {
         const canvas = this.effects.vcr.node;
         const ctx = this.effects.vcr.ctx;
@@ -311,6 +358,13 @@ class ScreenEffect {
         ctx.closePath();
     }
 
+    /**
+     * Rend la traînée des artefacts de bruit.
+     * @param {CanvasRenderingContext2D} ctx - Le contexte 2D.
+     * @param {number} x - Position X.
+     * @param {number} y - Position Y.
+     * @param {number} radius - Rayon.
+     */
     renderTail(ctx, x, y, radius) {
         const n = getRandomInt(1, 50);
 
@@ -332,6 +386,12 @@ class ScreenEffect {
     }
 }
 
+/**
+ * Initialise l'effet d'écran CRT avec une configuration donnée.
+ * @param {string} selector - Le sélecteur CSS de l'élément cible.
+ * @param {Object} customConfig - Configuration personnalisée.
+ * @returns {ScreenEffect} L'instance de l'effet d'écran.
+ */
 export function initScreenEffect(selector = "#screen", customConfig = {}) {
     const defaultConfig = {
         effects: {

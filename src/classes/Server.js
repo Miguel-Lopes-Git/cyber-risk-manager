@@ -1,4 +1,11 @@
+/**
+ * Représente un serveur complet composé de plusieurs composants matériels.
+ */
 export default class Server {
+    /**
+     * Constructeur de la classe Server.
+     * Initialise les listes de composants vides.
+     */
     constructor() {
         this.processors = [];
         this.cpuCoolers = [];
@@ -7,35 +14,77 @@ export default class Server {
         this.psu = null;
         this.ram = [];
         this.storage = [];
-        this.case = null; // optionnel
+        this.case = null;
     }
 
+    /**
+     * Ajoute un processeur au serveur.
+     * @param {Processor} cpu - Le processeur à ajouter.
+     */
     addProcessor(cpu) {
         this.processors.push(cpu);
     }
+
+    /**
+     * Ajoute un refroidisseur CPU au serveur.
+     * @param {CpuCooler} cooler - Le refroidisseur à ajouter.
+     */
     addCpuCooler(cooler) {
         this.cpuCoolers.push(cooler);
     }
+
+    /**
+     * Définit la carte mère du serveur.
+     * @param {Motherboard} mb - La carte mère à installer.
+     */
     setMotherboard(mb) {
         this.motherboard = mb;
     }
+
+    /**
+     * Ajoute une carte graphique au serveur.
+     * @param {GraphicsCard} gpu - La carte graphique à ajouter.
+     */
     addGPU(gpu) {
         this.gpus.push(gpu);
     }
+
+    /**
+     * Définit l'alimentation du serveur.
+     * @param {PowerSupply} psu - L'alimentation à installer.
+     */
     setPowerSupply(psu) {
         this.psu = psu;
     }
+
+    /**
+     * Ajoute une barrette de RAM au serveur.
+     * @param {Ram} module - La barrette de mémoire à ajouter.
+     */
     addRAM(module) {
         this.ram.push(module);
     }
+
+    /**
+     * Ajoute un périphérique de stockage au serveur.
+     * @param {Object} drive - Le disque dur ou SSD à ajouter.
+     */
     addStorage(drive) {
         this.storage.push(drive);
     }
+
+    /**
+     * Définit le boîtier du serveur.
+     * @param {Case} pcCase - Le boîtier à utiliser.
+     */
     setCase(pcCase) {
         this.case = pcCase;
     }
 
-    // Calculer le prix total du serveur
+    /**
+     * Calcule le prix total du serveur en additionnant le prix de tous les composants.
+     * @returns {number} - Le prix total en €.
+     */
     calculateTotalPrice() {
         let total = 0;
         this.processors.forEach((p) => (total += p.price || 0));
@@ -52,9 +101,13 @@ export default class Server {
     }
 
     // --------------------------------------------------------------------------
-    //                     CHECK COMPATIBILITY BETWEEN ALL PARTS
+    //                     VÉRIFICATION DE LA COMPATIBILITÉ
     // --------------------------------------------------------------------------
 
+    /**
+     * Vérifie la compatibilité entre tous les composants du serveur.
+     * @returns {string[]} - Une liste de chaînes de caractères décrivant les problèmes trouvés.
+     */
     checkCompatibility() {
         const issues = [];
 
@@ -66,16 +119,16 @@ export default class Server {
         const ram = this.ram;
         const storage = this.storage;
 
-        // ---------------------- Mandatory Components Check ----------------------
+        // ---------------------- Vérification des composants obligatoires ----------------------
         if (cpus.length === 0) issues.push("Manquant : Processeur(s).");
         if (!mb) issues.push("Manquant : Carte mère.");
         if (ram.length === 0) issues.push("Manquant : Mémoire RAM.");
-        if (storage.length === 0) issues.push("Manquant : Stockage."); // Assuming storage is mandatory
+        if (storage.length === 0) issues.push("Manquant : Stockage."); // On suppose que le stockage est obligatoire
         if (!psu) issues.push("Manquant : Alimentation.");
         if (coolers.length === 0)
             issues.push("Manquant : Refroidissement CPU.");
 
-        // ---------------------- CPU <-> Motherboard ----------------------
+        // ---------------------- CPU <-> Carte Mère ----------------------
         if (mb) {
             if (cpus.length > mb.cpuSockets) {
                 issues.push(
@@ -91,14 +144,13 @@ export default class Server {
                         } ↔ Carte mère : le socket ne correspond pas.`
                     );
 
-                // Check memory compatibility using Motherboard method if available, or manual check
+                // Vérification de la compatibilité mémoire via la méthode de la carte mère si disponible
                 if (
                     mb.isProcessorCompatible &&
                     typeof mb.isProcessorCompatible === "function"
                 ) {
-                    // This method already checks memory, but we want a specific error message for RAM
-                    // So we can just check the memory string manually here to be safe or rely on the method
-                    // Let's replicate the logic:
+                    // Cette méthode vérifie déjà la mémoire, mais on veut un message d'erreur spécifique pour la RAM
+                    // On réplique donc la logique ici :
                     const supportedTypes = cpu.memorySupport
                         ? cpu.memorySupport.split("/").map((t) => t.trim())
                         : [];
@@ -112,7 +164,7 @@ export default class Server {
                         );
                     }
                 } else if (cpu.memorySupport !== mb.memoryType) {
-                    // Fallback for old logic if needed, but we should use the split logic
+                    // Fallback pour l'ancienne logique si nécessaire
                     const supportedTypes = cpu.memorySupport
                         ? cpu.memorySupport.split("/").map((t) => t.trim())
                         : [];
@@ -127,7 +179,7 @@ export default class Server {
             });
         }
 
-        // ---------------------- CPU <-> Cooler ----------------------
+        // ---------------------- CPU <-> Refroidissement ----------------------
         if (cpus.length > 0) {
             if (coolers.length < cpus.length) {
                 issues.push(
@@ -156,14 +208,14 @@ export default class Server {
             });
         }
 
-        // ---------------------- RAM <-> Motherboard <-> CPU ----------------------
+        // ---------------------- RAM <-> Carte Mère <-> CPU ----------------------
         if (ram.length > 0 && mb) {
-            // total slots used
+            // Nombre total de slots utilisés
             const totalModules = ram.reduce((sum, r) => sum + r.modules, 0);
             if (totalModules > mb.memorySlots)
                 issues.push("RAM ↔ Carte mère : trop de barrettes installées.");
 
-            // each kit
+            // Vérification pour chaque kit de RAM
             ram.forEach((r) => {
                 if (r.type !== mb.memoryType)
                     issues.push(
@@ -195,7 +247,7 @@ export default class Server {
             });
         }
 
-        // ---------------------- GPU <-> Motherboard ----------------------
+        // ---------------------- GPU <-> Carte Mère ----------------------
         if (gpus.length > 0 && mb) {
             gpus.forEach((gpu, index) => {
                 if (gpu.pcieVersion > mb.pcieVersion)
@@ -206,8 +258,8 @@ export default class Server {
                     );
             });
 
-            // Check available slots (simplified)
-            // Assuming each GPU takes one x16 slot for now, or check slots
+            // Vérification des slots disponibles (simplifié)
+            // On suppose que chaque GPU prend un slot x16 pour l'instant
             const x16Slots = mb.pcieSlots.filter(
                 (s) => s.type === "x16"
             ).length;
@@ -218,16 +270,16 @@ export default class Server {
             }
         }
 
-        // ---------------------- GPU <-> PSU ----------------------
+        // ---------------------- GPU <-> Alimentation (PSU) ----------------------
         if (gpus.length > 0 && psu) {
             gpus.forEach((gpu, index) => {
-                // This check is per GPU vs PSU wattage? No, PSU wattage is total.
-                // Individual check might be for connectors.
-                // We check total power later.
+                // Cette vérification est par GPU vs PSU wattage ? Non, le wattage PSU est total.
+                // Une vérification individuelle pourrait concerner les connecteurs.
+                // Nous vérifions la puissance totale plus tard.
             });
         }
 
-        // ---------------------- PSU total wattage <-> ALL COMPONENTS ----------------------
+        // ---------------------- Puissance totale PSU <-> TOUS LES COMPOSANTS ----------------------
         if (psu) {
             let totalPower = 0;
 
@@ -236,7 +288,7 @@ export default class Server {
             ram.forEach((r) => (totalPower += 5 * r.modules));
             storage.forEach((s) => (totalPower += s.type === "M2" ? 5 : 8));
 
-            // 20% headroom
+            // Marge de sécurité de 20%
             const requiredPSU = Math.round(totalPower * 1.2);
 
             if (psu.wattage < requiredPSU)
@@ -245,7 +297,7 @@ export default class Server {
                 );
         }
 
-        // ---------------------- Storage <-> Motherboard ----------------------
+        // ---------------------- Stockage <-> Carte Mère ----------------------
         if (storage.length > 0 && mb) {
             const m2Used = storage.filter((s) => s.type === "M2").length;
             const sataUsed = storage.filter((s) => s.type === "SATA").length;
@@ -261,7 +313,7 @@ export default class Server {
                 );
         }
 
-        // ---------------------- GPU/RAM/Cooler <-> Case (optionnel) ----------------------
+        // ---------------------- GPU/RAM/Cooler <-> Boîtier (optionnel) ----------------------
         if (this.case) {
             gpus.forEach((gpu, index) => {
                 if (gpu.length > this.case.gpuMaxLength)
@@ -291,18 +343,5 @@ export default class Server {
         }
 
         return issues;
-    }
-
-    printStatus() {
-        const issues = this.checkCompatibility();
-
-        console.log("────────────────────────────────────────");
-        if (issues.length === 0) {
-            console.log("✔️ TOUT EST COMPATIBLE !");
-        } else {
-            console.log("❌ INCOMPATIBILITÉS DÉTECTÉES :");
-            issues.forEach((i) => console.log(" - " + i));
-        }
-        console.log("────────────────────────────────────────");
     }
 }

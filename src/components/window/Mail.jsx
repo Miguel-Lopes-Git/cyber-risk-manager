@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+/**
+ * Composant Mail simulant une application de messagerie.
+ */
 export default function Mail() {
     const [selectedMail, setSelectedMail] = useState(null);
 
@@ -16,7 +19,7 @@ export default function Mail() {
 
     return (
         <div className="flex h-full w-full">
-            {/* Liste des mails à gauche */}
+            {/* Liste des e-mails (colonne de gauche) */}
             <div className="w-48 border-r-2 border-black">
                 {mails.map((mail) => (
                     <div
@@ -31,7 +34,7 @@ export default function Mail() {
                 ))}
             </div>
 
-            {/* Contenu du mail à droite */}
+            {/* Contenu de l'e-mail sélectionné (colonne de droite) */}
             <div className="flex-1 flex items-center justify-center">
                 {selectedMail ? (
                     <div className="p-8">

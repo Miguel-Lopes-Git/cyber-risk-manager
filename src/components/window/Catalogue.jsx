@@ -21,6 +21,9 @@ const categories = [
     { id: "rackBays", label: "Baies Rack", data: rackBays },
 ];
 
+/**
+ * Composant Catalogue affichant la liste des composants disponibles à l'achat.
+ */
 export default function Catalogue() {
     const [selectedCategory, setSelectedCategory] = useState(categories[0]);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -36,7 +39,7 @@ export default function Catalogue() {
 
     return (
         <div className="flex w-full h-full bg-[#ECE9D8] font-sans text-sm">
-            {/* Sidebar - Categories */}
+            {/* Barre latérale - Liste des catégories */}
             <div className="w-48 flex flex-col gap-1 p-2 border-r-2 border-white shadow-[inset_-1px_-1px_0_0_#ACA899,inset_1px_1px_0_0_white]">
                 <div className="bg-linear-to-r from-[#3E6FD8] to-[#96B4E8] p-2 mb-2">
                     <h2 className="text-white font-bold text-lg">Catégories</h2>
@@ -56,7 +59,7 @@ export default function Catalogue() {
                 ))}
             </div>
 
-            {/* Main Content - List */}
+            {/* Contenu principal - Liste des produits */}
             <div className="flex-1 flex flex-col p-2 overflow-hidden">
                 <div
                     ref={listRef}
@@ -99,7 +102,7 @@ export default function Catalogue() {
                 </div>
             </div>
 
-            {/* Details Panel (Right or Bottom, let's do Right for wide screens) */}
+            {/* Panneau de détails (à droite) */}
             {selectedItem && (
                 <div className="w-64 bg-[#F0F0F0] border-l-2 border-white shadow-[inset_1px_1px_0_0_#ACA899] p-4 overflow-auto flex flex-col gap-4">
                     <div className="border-b border-[#ACA899] pb-2">
@@ -131,7 +134,7 @@ export default function Catalogue() {
                                         typeof value === "object" &&
                                         value !== null
                                     )
-                                        return null; // Skip complex objects for now
+                                        return null; // Ignore les objets complexes pour l'affichage simple
                                     if (value === undefined || value === null)
                                         return null;
                                     return (

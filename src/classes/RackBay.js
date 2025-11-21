@@ -1,13 +1,30 @@
+/**
+ * Représente une baie de serveur (Rack) pouvant contenir plusieurs boîtiers.
+ */
 export default class RackBay {
+    /**
+     * Constructeur de la classe RackBay (Baie de serveur).
+     * @param {Object} params - Les paramètres de la baie.
+     * @param {string} params.brand - La marque de la baie.
+     * @param {string} params.model - Le modèle de la baie.
+     * @param {number} params.totalU - Hauteur totale disponible en unités (U).
+     * @param {number} params.price - Prix de la baie en €.
+     */
     constructor({ brand, model, totalU, price = 0 }) {
         this.brand = brand;
         this.model = model;
-        this.totalU = totalU; // hauteur totale disponible du rack
-        this.cases = []; // liste des boîtiers installés
+        this.totalU = totalU; // Hauteur totale disponible du rack
+        this.cases = []; // Liste des boîtiers installés
         this.price = price; // Prix en €
     }
 
-    // Ajouter un boîtier
+    /**
+     * Ajoute un boîtier dans le rack à une position donnée.
+     * @param {Object} serverCase - Le boîtier à ajouter.
+     * @param {number} startU - La position de départ (en U) dans le rack.
+     * @returns {boolean} - Retourne true si l'ajout a réussi.
+     * @throws {Error} - Si le boîtier dépasse la hauteur ou si l'emplacement est occupé.
+     */
     addCase(serverCase, startU) {
         // Vérifier si le boîtier rentre dans le rack
         if (startU < 1 || startU + serverCase.sizeU - 1 > this.totalU) {
@@ -21,10 +38,7 @@ export default class RackBay {
             }
         }
 
-        // Ajouter la position au boîtier (ou le wrapper)
-        // On va modifier l'objet case pour lui ajouter sa position dans ce rack
-        // Idéalement on ne devrait pas modifier l'objet Case, mais pour simplifier ici on va le faire
-        // ou stocker un objet { case: serverCase, startU: startU }
+        // Ajouter la position au boîtier (stocké sous forme d'objet avec sa position)
         this.cases.push({ component: serverCase, startU: startU });
 
         console.log(
@@ -33,14 +47,22 @@ export default class RackBay {
         return true;
     }
 
-    // Récupérer le boîtier à une position donnée (U)
+    /**
+     * Récupère le boîtier installé à une position donnée (U).
+     * @param {number} u - La position en U à vérifier.
+     * @returns {Object|undefined} - L'objet contenant le boîtier et sa position, ou undefined si vide.
+     */
     getCaseAt(u) {
         return this.cases.find(
             (c) => u >= c.startU && u < c.startU + c.component.sizeU
         );
     }
 
-    // Retirer un boîtier
+    /**
+     * Retire un boîtier du rack à une position donnée.
+     * @param {number} u - La position en U où se trouve le boîtier.
+     * @returns {boolean} - Retourne true si un boîtier a été retiré, sinon false.
+     */
     removeCase(u) {
         const index = this.cases.findIndex(
             (c) => u >= c.startU && u < c.startU + c.component.sizeU
@@ -52,32 +74,20 @@ export default class RackBay {
         return false;
     }
 
-    // Améliorer le rack (ajouter des U)
+    /**
+     * Améliore le rack en ajoutant des unités supplémentaires.
+     * @param {number} additionalU - Nombre d'unités (U) à ajouter.
+     */
     upgrade(additionalU) {
         this.totalU += additionalU;
     }
 
-    // Vérifie l'espace restant (juste le nombre de U libres total, pas contigus)
+    /**
+     * Calcule l'espace restant total dans le rack (somme des U libres).
+     * @returns {number} - Nombre d'unités (U) disponibles.
+     */
     availableU() {
         const usedU = this.cases.reduce((sum, c) => sum + c.component.sizeU, 0);
         return this.totalU - usedU;
-    }
-
-    // Affiche l'état du rack
-    printStatus() {
-        console.log("───────── Rack Status ─────────");
-        console.log(`Capacité totale : ${this.totalU}U`);
-        console.log(`Place disponible : ${this.availableU()}U`);
-        console.log("Cases installés :");
-        if (this.cases.length === 0) {
-            console.log(" - Aucun boîtier installé");
-        } else {
-            this.cases.forEach((c) => {
-                console.log(
-                    ` - Slot ${c.startU}: ${c.component.brand} ${c.component.model} (${c.component.sizeU}U)`
-                );
-            });
-        }
-        console.log("───────────────────────────────");
     }
 }

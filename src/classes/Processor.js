@@ -1,27 +1,32 @@
+/**
+ * Représente un processeur (CPU).
+ */
 export default class Processor {
-    // attributs publics
-    brand; // e.g., AMD, Intel
-    model; // e.g., Ryzen 5 5600X
-    architecture; // e.g., x86, ARM
-    socket; // type of socket
-    baseClock; // in Ghz
-    boostClock; // in Ghz
-    cores; // number of cores
-    threads; // number of threads
-    cacheL1; // in MB
-    cacheL2; // in MB
-    cacheL3; // in MB
-    tdp; // in Watts
-    lithography; // in nm
-    integratedGraphics; // boolean
-    releaseDate; // year of release
-    speed; // in MHz
-    maxTemp; // in Celsius
-    memorySupport; // in GO
-    memorySpeed; // max capacity in GHz
-    pciExpressVersion; // version of PCIe supported
-    price; // Prix en €
-
+    /**
+     * Constructeur de la classe Processor (Processeur).
+     * @param {Object} params - Les paramètres du processeur.
+     * @param {string} params.brand - Marque (ex: AMD, Intel).
+     * @param {string} params.model - Modèle (ex: Ryzen 5 5600X).
+     * @param {string} params.architecture - Architecture (ex: x86, ARM).
+     * @param {string} params.socket - Type de socket.
+     * @param {number} params.baseClock - Fréquence de base en GHz.
+     * @param {number} params.boostClock - Fréquence boost en GHz.
+     * @param {number} params.cores - Nombre de cœurs.
+     * @param {number} params.threads - Nombre de threads.
+     * @param {number} params.cacheL1 - Cache L1 en Mo.
+     * @param {number} params.cacheL2 - Cache L2 en Mo.
+     * @param {number} params.cacheL3 - Cache L3 en Mo.
+     * @param {number} params.tdp - Enveloppe thermique (TDP) en Watts.
+     * @param {string} params.lithography - Finesse de gravure en nm.
+     * @param {boolean} params.integratedGraphics - Présence d'un chipset graphique intégré.
+     * @param {number} params.releaseDate - Année de sortie.
+     * @param {number} params.speed - Vitesse en MHz.
+     * @param {number} params.maxTemp - Température maximale en Celsius.
+     * @param {string} params.memorySupport - Type de mémoire supportée (ex: DDR4/DDR5).
+     * @param {number} params.memorySpeed - Vitesse mémoire maximale en MHz.
+     * @param {string} params.pciExpressVersion - Version PCIe supportée.
+     * @param {number} params.price - Prix en €.
+     */
     constructor({
         brand,
         model,
@@ -60,38 +65,11 @@ export default class Processor {
         this.lithography = lithography;
         this.integratedGraphics = integratedGraphics;
         this.releaseDate = releaseDate;
-        this.speed = speed;
+        this.speedsupportedMotherboards = speed;
         this.maxTemp = maxTemp;
         this.memorySupport = memorySupport;
         this.memorySpeed = memorySpeed;
         this.pciExpressVersion = pciExpressVersion;
         this.price = price;
-    }
-
-    // méthode pour obtenir toute les informations du processeur
-    getInfo() {
-        return {
-            brand: this.brand,
-            model: this.model,
-            architecture: this.architecture,
-            socket: this.socket,
-            baseClock: this.baseClock,
-            boostClock: this.boostClock,
-            cores: this.cores,
-            threads: this.threads,
-            cacheL1: this.cacheL1,
-            cacheL2: this.cacheL2,
-            cacheL3: this.cacheL3,
-            tdp: this.tdp,
-            lithography: this.lithography,
-            integratedGraphics: this.integratedGraphics,
-            releaseDate: this.releaseDate,
-            speed: this.speed,
-            maxTemp: this.maxTemp,
-            memorySupport: this.memorySupport,
-            memorySpeed: this.memorySpeed,
-            pciExpressVersion: this.pciExpressVersion,
-            price: this.price,
-        };
     }
 }
