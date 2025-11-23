@@ -14,6 +14,9 @@ import Catalogue from "@/components/window/Catalogue";
 import ServerWindow from "@/components/window/ServerWindow";
 import IaPannel from "@/components/UI/IaPannel";
 import BootScreen from "@/components/UI/BootScreen";
+import AuthScreen from "@/components/UI/AuthScreen";
+import LoadingSpinner from "@/components/UI/LoadingSpinner";
+import { supabase } from "@/lib/supabase";
 
 /**
  * Composant principal du contenu de l'ordinateur.
@@ -24,33 +27,50 @@ import BootScreen from "@/components/UI/BootScreen";
 function ComputerContent() {
     // États pour la gestion de la connexion et du joueur
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loginError, setLoginError] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [player, setPlayer] = useState(new Player("", 0));
     const [showIaPanel, setShowIaPanel] = useState(false);
     const [isBooting, setIsBooting] = useState(true);
+    const [isCheckingSession, setIsCheckingSession] = useState(true);
+    const [autoLoginName, setAutoLoginName] = useState(null);
 
     /**
-     * Gère la tentative de connexion de l'utilisateur.
-     * Vérifie les champs et initialise le joueur.
+     * Gère la connexion réussie (depuis AuthScreen ou session existante).
      */
-    function handleLogin() {
-        // Vérification basique des champs
-        if (!username && !password) {
-            setLoginError(
-                "Veuillez entrer un nom d'utilisateur et un mot de passe."
-            );
-            return;
-        }
-        // Initialisation du joueur avec un solde de départ
+    const handleLoginSuccess = (username) => {
         player.setName(username);
-        player.credit(5000);
+        player.credit(5000); // TODO: Récupérer le vrai solde depuis la DB si possible
         console.log(
             `Le solde actuel de ${player.name} est de ${player.getSolde()}€.`
         );
         setIsLoggedIn(true);
-    }
+    };
+
+    // Vérification de la session Supabase au démarrage
+    useEffect(() => {
+        const checkSession = async () => {
+            // On attend que le boot soit terminé avant de vérifier/afficher la session
+            if (isBooting) return;
+
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (session) {
+                const username =
+                    session.user.user_metadata.username || "Joueur";
+                setAutoLoginName(username);
+                // Si session existe, on simule un chargement de 3s minimum
+                setTimeout(() => {
+                    handleLoginSuccess(username);
+                    setIsCheckingSession(false);
+                }, 3000);
+            } else {
+                setIsCheckingSession(false);
+            }
+        };
+
+        checkSession();
+    }, [isBooting]); // Dépendance ajoutée sur isBooting
 
     // Référence à l'élément DOM de l'écran pour l'effet CRT
     const screenRef = useRef(null);
@@ -89,48 +109,17 @@ function ComputerContent() {
                 ref={screenRef}
                 className={isBooting ? "hidden" : ""}
             >
-                {/* Écran de connexion */}
+                {/* Écran de connexion ou Chargement Session */}
                 {!isLoggedIn && (
-                    <div className="absolute top-0 left-0 w-full h-full bg-opacity-80 z-50 flex flex-col justify-center items-center">
-                        <Image
-                            src="/images/login-image.webp"
-                            alt="Login"
-                            width={200}
-                            height={200}
-                            className="border-6 border-blue-600 rounded-lg"
-                        />
-                        <h1 className="text-white text-4xl my-4">Connexion</h1>
-
-                        <input
-                            type="text"
-                            name="username"
-                            id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Nom d'utilisateur"
-                            className="w-50 h-12 p-2 text-2xl border-4 border-black bg-gray-300 rounded-lg mb-2"
-                        />
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Mot de passe"
-                            className="w-50 h-12 p-2 text-2xl border-4 border-black bg-gray-300 rounded-lg mb-2"
-                        />
-                        {loginError && (
-                            <p className="text-red-500 mb-2 text-3xl font-bold">
-                                {loginError}
-                            </p>
-                        )}
-                        <button
-                            className="w-50 text-2xl cursor-pointer px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            onClick={handleLogin}
-                        >
-                            Se connecter
-                        </button>
-                    </div>
+                    <AuthScreen
+                        onLogin={handleLoginSuccess}
+                        isLoading={isCheckingSession && !!autoLoginName}
+                        loadingMessage={
+                            autoLoginName
+                                ? `Bienvenue ${autoLoginName}`
+                                : undefined
+                        }
+                    />
                 )}
 
                 {/* Bureau (affiché une fois connecté) */}
