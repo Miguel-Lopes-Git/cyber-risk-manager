@@ -8,6 +8,7 @@ import {
     cases,
     cpuCoolers,
     rackBays,
+    storageDevices,
 } from "@/data/initialData";
 
 const categories = [
@@ -19,6 +20,7 @@ const categories = [
     { id: "cpuCoolers", label: "Refroidissement", data: cpuCoolers },
     { id: "cases", label: "Boîtiers", data: cases },
     { id: "rackBays", label: "Baies Rack", data: rackBays },
+    { id: "storageDevices", label: "Stockage", data: storageDevices },
 ];
 
 /**
@@ -44,19 +46,21 @@ export default function Catalogue() {
                 <div className="bg-linear-to-r from-[#3E6FD8] to-[#96B4E8] p-2 mb-2">
                     <h2 className="text-white font-bold text-lg">Catégories</h2>
                 </div>
-                {categories.map((cat) => (
-                    <button
-                        key={cat.id}
-                        onClick={() => handleCategoryChange(cat)}
-                        className={`text-left px-3 py-2 border border-transparent hover:underline hover:text-blue-800 ${
-                            selectedCategory.id === cat.id
-                                ? "font-bold text-blue-700 bg-white border-[#ACA899]"
-                                : "text-gray-800"
-                        }`}
-                    >
-                        {cat.label}
-                    </button>
-                ))}
+                <div className="flex flex-col gap-1 overflow-y-auto">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => handleCategoryChange(cat)}
+                            className={`text-left px-3 py-2 border border-transparent hover:underline hover:text-blue-800 ${
+                                selectedCategory.id === cat.id
+                                    ? "font-bold text-blue-700 bg-white border-[#ACA899]"
+                                    : "text-gray-800"
+                            }`}
+                        >
+                            {cat.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Contenu principal - Liste des produits */}

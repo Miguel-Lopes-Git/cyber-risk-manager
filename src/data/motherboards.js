@@ -32,7 +32,7 @@ export const motherboards = {
         pciExpressVersion: "1.1",
         pcieSlots: [{ type: "x16", version: "1.1" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 5,
     }),
     megabyte_ga_p35_ds3: new Motherboard({
@@ -47,7 +47,7 @@ export const motherboards = {
         pciExpressVersion: "1.1",
         pcieSlots: [{ type: "x16", version: "1.1" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 8,
     }),
     sus_p5q_pro: new Motherboard({
@@ -62,7 +62,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 12,
     }),
     mzi_p45_neo: new Motherboard({
@@ -77,7 +77,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 10,
     }),
     azrock_g41m_vs3: new Motherboard({
@@ -92,7 +92,7 @@ export const motherboards = {
         pciExpressVersion: "1.1",
         pcieSlots: [{ type: "x16", version: "1.1" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 15,
     }),
 
@@ -109,7 +109,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 20,
     }),
     megabyte_ga_h55m_s2: new Motherboard({
@@ -124,7 +124,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 18,
     }),
 
@@ -144,7 +144,7 @@ export const motherboards = {
             { type: "x16", version: "2.0" },
         ],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 50,
     }),
     megabyte_ga_x58a_ud3r: new Motherboard({
@@ -159,7 +159,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 45,
     }),
 
@@ -176,7 +176,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 20,
     }),
     mzi_z77a_g43: new Motherboard({
@@ -191,7 +191,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 40,
     }),
     azrock_z77_extreme4: new Motherboard({
@@ -206,7 +206,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 45,
     }),
     sus_sabertooth_z77: new Motherboard({
@@ -221,7 +221,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 60,
     }),
 
@@ -238,7 +238,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 25,
     }),
     megabyte_ga_b85m_d3h: new Motherboard({
@@ -253,7 +253,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 35,
     }),
     mzi_z97_gaming_5: new Motherboard({
@@ -268,7 +268,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 60,
     }),
     sus_maximus_vii_hero: new Motherboard({
@@ -283,7 +283,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 80,
     }),
 
@@ -300,7 +300,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 30,
     }),
     sus_b150m_a: new Motherboard({
@@ -315,7 +315,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 45,
     }),
     sus_z170_a: new Motherboard({
@@ -330,7 +330,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 70,
     }),
     mzi_z270_gaming_pro_carbon: new Motherboard({
@@ -345,7 +345,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 90,
     }),
 
@@ -362,7 +362,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 40,
     }),
     sus_prime_b360m_a: new Motherboard({
@@ -377,7 +377,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 60,
     }),
     mzi_z370_a_pro: new Motherboard({
@@ -392,7 +392,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 80,
     }),
     megabyte_z390_aorus_pro: new Motherboard({
@@ -407,7 +407,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 120,
     }),
 
@@ -424,7 +424,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 50,
     }),
     mzi_b460m_mortar: new Motherboard({
@@ -439,7 +439,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 80,
     }),
     sus_rog_strix_z490_e: new Motherboard({
@@ -454,7 +454,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 180,
     }),
     megabyte_z590_vision_g: new Motherboard({
@@ -469,7 +469,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 200,
     }),
 
@@ -486,7 +486,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 70,
     }),
     mzi_pro_b660m_a_ddr4: new Motherboard({
@@ -501,7 +501,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 110,
     }),
     mzi_mag_b760_tomahawk_wifi: new Motherboard({
@@ -516,7 +516,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 160,
     }),
     sus_rog_strix_z690_f: new Motherboard({
@@ -531,7 +531,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 250,
     }),
     megabyte_z790_aorus_master: new Motherboard({
@@ -546,7 +546,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2", "M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 400,
     }),
     sus_rog_maximus_z790_hero: new Motherboard({
@@ -561,7 +561,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2", "M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 500,
     }),
 
@@ -582,7 +582,7 @@ export const motherboards = {
         pciExpressVersion: "1.0",
         pcieSlots: [{ type: "x16", version: "1.0" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 10,
     }),
     megabyte_ga_ma770_ds3: new Motherboard({
@@ -597,7 +597,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 15,
     }),
 
@@ -614,7 +614,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 20,
     }),
     sus_m5a78l_m_lx: new Motherboard({
@@ -629,7 +629,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 25,
     }),
     megabyte_ga_970a_ds3p: new Motherboard({
@@ -644,7 +644,7 @@ export const motherboards = {
         pciExpressVersion: "2.0",
         pcieSlots: [{ type: "x16", version: "2.0" }],
         m2Slots: [],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 40,
     }),
     sus_sabertooth_990fx: new Motherboard({
@@ -662,7 +662,7 @@ export const motherboards = {
             { type: "x16", version: "2.0" },
         ],
         m2Slots: [],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 70,
     }),
 
@@ -679,7 +679,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 40,
     }),
     sus_prime_b350_plus: new Motherboard({
@@ -694,7 +694,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 60,
     }),
     mzi_b450_tomahawk_max: new Motherboard({
@@ -709,7 +709,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 80,
     }),
     sus_rog_strix_b450_f: new Motherboard({
@@ -724,7 +724,7 @@ export const motherboards = {
         pciExpressVersion: "3.0",
         pcieSlots: standardSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 90,
     }),
     megabyte_b550_aorus_elite: new Motherboard({
@@ -739,7 +739,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 120,
     }),
     sus_rog_crosshair_viii_hero: new Motherboard({
@@ -754,7 +754,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 8,
+        sataPorts: 8,
         price: 250,
     }),
 
@@ -771,7 +771,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 140,
     }),
     megabyte_b650_gaming_x_ax: new Motherboard({
@@ -786,7 +786,7 @@ export const motherboards = {
         pciExpressVersion: "4.0",
         pcieSlots: modernSlots,
         m2Slots: ["M.2", "M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 160,
     }),
     sus_rog_strix_b650e_f: new Motherboard({
@@ -801,7 +801,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 220,
     }),
     mzi_mag_x670e_tomahawk: new Motherboard({
@@ -816,7 +816,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2", "M.2"],
-        sataSlots: 4,
+        sataPorts: 4,
         price: 280,
     }),
     sus_rog_crosshair_x670e_hero: new Motherboard({
@@ -831,7 +831,7 @@ export const motherboards = {
         pciExpressVersion: "5.0",
         pcieSlots: nextGenSlots,
         m2Slots: ["M.2", "M.2", "M.2", "M.2"],
-        sataSlots: 6,
+        sataPorts: 6,
         price: 500,
     }),
 };

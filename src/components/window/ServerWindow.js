@@ -7,6 +7,7 @@ import {
     ramModules,
     graphicsCards,
     powerSupplies,
+    storageDevices,
 } from "@/data/initialData";
 import Server from "@/classes/Server";
 
@@ -27,6 +28,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
         cooler: null,
         ram: [],
         gpu: [],
+        storage: [],
         psu: null,
     });
 
@@ -81,6 +83,34 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                     }
                 }
                 newConfig.gpu = [...prev.gpu, item];
+            } else if (type === "storage") {
+                // Vérifie la disponibilité des ports SATA / slots M.2
+                if (prev.motherboard) {
+                    const isM2 = item.formFactor === "M.2";
+
+                    if (isM2) {
+                        const m2Used = prev.storage.filter(
+                            (s) => s.formFactor === "M.2"
+                        ).length;
+                        if (m2Used >= prev.motherboard.m2Slots.length) {
+                            alert(
+                                `Plus de slots M.2 disponibles ! (${m2Used}/${prev.motherboard.m2Slots.length})`
+                            );
+                            return prev;
+                        }
+                    } else {
+                        const sataUsed = prev.storage.filter(
+                            (s) => s.formFactor !== "M.2"
+                        ).length;
+                        if (sataUsed >= prev.motherboard.sataPorts) {
+                            alert(
+                                `Plus de ports SATA disponibles ! (${sataUsed}/${prev.motherboard.sataPorts})`
+                            );
+                            return prev;
+                        }
+                    }
+                }
+                newConfig.storage = [...prev.storage, item];
             } else {
                 newConfig[type] = item;
 
@@ -91,12 +121,14 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                     newConfig.cooler = null;
                     newConfig.ram = [];
                     newConfig.gpu = [];
+                    newConfig.storage = [];
                     newConfig.psu = null;
                 } else if (type === "motherboard") {
                     newConfig.cpu = null;
                     newConfig.cooler = null;
                     newConfig.ram = [];
                     newConfig.gpu = [];
+                    newConfig.storage = [];
                 } else if (type === "cpu") {
                     newConfig.cooler = null;
                 }
@@ -105,13 +137,13 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             return newConfig;
         });
 
-        // Maintient le sélecteur ouvert pour RAM et GPU (sélection multiple)
-        if (type !== "ram" && type !== "gpu") {
+        // Maintient le sélecteur ouvert pour RAM, GPU et Stockage (sélection multiple)
+        if (type !== "ram" && type !== "gpu" && type !== "storage") {
             setShowSelector(null);
         }
     };
 
-    // Retire un composant de la liste (RAM/GPU)
+    // Retire un composant de la liste (RAM/GPU/Stockage)
     const handleRemove = (type, index) => {
         setConfig((prev) => {
             const newConfig = { ...prev };
@@ -155,6 +187,13 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                 return Object.values(graphicsCards).filter(
                     (g) => g.length <= config.case.gpuMaxLength
                 );
+            case "storage":
+                if (!config.motherboard) return [];
+                return Object.values(storageDevices).filter((s) => {
+                    if (s.formFactor === "M.2")
+                        return config.motherboard.m2Slots.length > 0;
+                    return config.motherboard.sataPorts > 0;
+                });
             case "psu":
                 if (!config.case) return [];
                 // Vérifie la compatibilité avec la longueur maximale de l'alimentation
@@ -182,6 +221,8 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                 return !!config.motherboard;
             case "gpu":
                 return !!config.motherboard;
+            case "storage":
+                return !!config.motherboard;
             case "psu":
                 return !!config.case;
             default:
@@ -201,6 +242,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             !config.cpu ||
             !config.cooler ||
             config.ram.length === 0 ||
+            config.storage.length === 0 ||
             !config.psu
         ) {
             alert("Configuration incomplète !");
@@ -235,6 +277,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                         { id: "cooler", label: "Refroidissement" },
                         { id: "ram", label: "Mémoire RAM" },
                         { id: "gpu", label: "Carte Graphique" },
+                        { id: "storage", label: "Stockage" },
                         { id: "psu", label: "Alimentation" },
                     ].map((part) => (
                         <div
@@ -370,6 +413,15 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                                                                     U)
                                                                 </span>
                                                             )}
+                                                            {item.capacity && (
+                                                                <span className="text-sm ml-2 opacity-75">
+                                                                    (
+                                                                    {
+                                                                        item.capacity
+                                                                    }
+                                                                    GB)
+                                                                </span>
+                                                            )}
                                                         </td>
                                                         <td className="p-2 border border-[#E0DFE3] text-lg text-right font-mono">
                                                             {item.price} €
@@ -432,6 +484,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                         !config.cpu ||
                         !config.cooler ||
                         config.ram.length === 0 ||
+                        config.storage.length === 0 ||
                         !config.psu
                     }
                     className={`px-6 py-2 rounded text-xl font-bold border-2 shadow-md transition-all ${
@@ -440,6 +493,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                         !config.cpu ||
                         !config.cooler ||
                         config.ram.length === 0 ||
+                        config.storage.length === 0 ||
                         !config.psu
                             ? "bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed"
                             : "bg-[#0058EE] border-[#003C74] text-white hover:bg-[#3593FF]"
@@ -503,6 +557,7 @@ export default function ServerWindow({ Player }) {
 
             config.ram.forEach((r) => newServer.addRAM(r));
             config.gpu.forEach((g) => newServer.addGPU(g));
+            config.storage.forEach((s) => newServer.addStorage(s));
 
             newServer.setPowerSupply(config.psu);
 
@@ -577,7 +632,7 @@ export default function ServerWindow({ Player }) {
                 slots.push(
                     <div
                         key={u}
-                        className="h-[40px] border-2 border-gray-500 border-dashed m-1 flex items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors"
+                        className="h-10 border-2 border-gray-500 border-dashed m-1 flex items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors"
                         onClick={() => handleSlotClick(u)}
                     >
                         <span className="text-gray-400 text-lg font-semibold">

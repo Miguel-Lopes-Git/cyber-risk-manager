@@ -12,6 +12,8 @@ import Folder from "@/components/window/Folder";
 import Mail from "@/components/window/Mail";
 import Catalogue from "@/components/window/Catalogue";
 import ServerWindow from "@/components/window/ServerWindow";
+import IaPannel from "@/components/UI/IaPannel";
+import BootScreen from "@/components/UI/BootScreen";
 
 /**
  * Composant principal du contenu de l'ordinateur.
@@ -26,6 +28,8 @@ function ComputerContent() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [player, setPlayer] = useState(new Player("", 0));
+    const [showIaPanel, setShowIaPanel] = useState(false);
+    const [isBooting, setIsBooting] = useState(true);
 
     /**
      * Gère la tentative de connexion de l'utilisateur.
@@ -79,7 +83,12 @@ function ComputerContent() {
 
     return (
         <>
-            <div id="screen" ref={screenRef}>
+            {isBooting && <BootScreen onComplete={() => setIsBooting(false)} />}
+            <div
+                id="screen"
+                ref={screenRef}
+                className={isBooting ? "hidden" : ""}
+            >
                 {/* Écran de connexion */}
                 {!isLoggedIn && (
                     <div className="absolute top-0 left-0 w-full h-full bg-opacity-80 z-50 flex flex-col justify-center items-center">
@@ -215,8 +224,14 @@ function ComputerContent() {
                                 {window.content}
                             </Window>
                         ))}
+                        <div className={showIaPanel ? "block" : "hidden"}>
+                            <IaPannel onClose={() => setShowIaPanel(false)} />
+                        </div>
                         {/* Barre des tâches (Footer) */}
-                        <Footer className="z-100 row-end-13 col-span-full bg-gray-400" />
+                        <Footer
+                            className="z-100 row-end-13 col-span-full bg-linear-180 from-[#84A9FF] to-[#AAC4FF]"
+                            onToggleIaPanel={() => setShowIaPanel(!showIaPanel)}
+                        />
                     </div>
                 )}
             </div>

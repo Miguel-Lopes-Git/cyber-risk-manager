@@ -7,6 +7,7 @@ import { powerSupplies } from "./powerSupplies.js";
 import { cases } from "./cases.js";
 import { cpuCoolers } from "./cpuCoolers.js";
 import { rackBays } from "./rackBays.js";
+import { storageDevices } from "./storage.js";
 
 export {
     brands,
@@ -18,4 +19,5 @@ export {
     cases,
     cpuCoolers,
     rackBays,
+    storageDevices,
 };

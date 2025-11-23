@@ -8,7 +8,7 @@ import Image from "next/image";
  * @param {Object} props - Les propriétés du composant.
  * @param {string} props.className - Classes CSS supplémentaires.
  */
-export default function Footer({ className }) {
+export default function Footer({ className, onToggleIaPanel }) {
     const [currentWeather, setCurrentWeather] = useState("");
     const [contextMenu, setContextMenu] = useState(null);
     const { windows, restoreWindow, closeWindow } = useWindows();
@@ -78,70 +78,96 @@ export default function Footer({ className }) {
     }, []);
 
     return (
-        <footer
-            className={
-                "flex justify-between pt-4 px-8 select-none " + className
-            }
-        >
-            {/* Menu Démarrer et fenêtres ouvertes */}
-            <div className="flex gap-2 items-center relative">
-                {windows.map((window) => (
-                    <button
-                        key={window.id}
-                        onClick={() => restoreWindow(window.id)}
-                        onContextMenu={(e) => handleContextMenu(e, window.id)}
-                        className={`p-2 rounded border-2 flex items-center justify-center w-16 h-16 ${
-                            window.isMinimized
-                                ? "bg-gray-200 border-gray-400"
-                                : "bg-blue-500 border-blue-700"
-                        } hover:bg-blue-600 hover:border-blue-800 transition-colors`}
-                        title={window.title}
-                    >
+        <footer className={"flex flex-col select-none " + className}>
+            {/* Effet de relief style Windows XP */}
+            <div className="w-full h-0.5 bg-linear-to-r from-white/40 via-white/60 to-white/40 border-b border-white/20 shadow-sm"></div>
+
+            <div className="flex justify-between w-full h-full">
+                {/* Container Gauche : Menu Démarrer + Fenêtres */}
+                <div className="flex items-center gap-4 px-4 py-2">
+                    {/* Menu démarrer */}
+                    <div className="flex items-center hover:brightness-110 transition-all cursor-pointer active:scale-95">
                         <Image
-                            src={window.iconPath}
-                            alt={window.title}
+                            src="/images/footer/icon_user.png"
+                            alt="Menu Démarrer"
                             width={40}
                             height={40}
+                            className="drop-shadow-lg"
                         />
-                    </button>
-                ))}
-
-                {/* Menu contextuel */}
-                {contextMenu && (
-                    <div
-                        className="fixed bg-white border-2 border-gray-300 rounded shadow-lg z-50"
-                        style={{
-                            left: `${contextMenu.x}px`,
-                            top: `${contextMenu.y - 50}px`,
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() =>
-                                handleCloseWindow(contextMenu.windowId)
-                            }
-                            className="px-4 py-2 hover:bg-gray-200 w-full text-left text-gray-800"
-                        >
-                            Fermer la fenêtre
-                        </button>
                     </div>
-                )}
-            </div>
 
-            {/* Informations de droite (Météo, Heure) */}
-            <div className="flex gap-6">
-                {/* Météo */}
-                <div>
-                    <span className="text-3xl px-3 py-2 bg-gray-300 rounded-lg">
-                        {currentWeather || "00°C"}
-                    </span>
+                    {/* Fenêtres ouvertes */}
+                    <div className="flex gap-2 items-center relative">
+                        {windows.map((window) => (
+                            <button
+                                key={window.id}
+                                onClick={() => restoreWindow(window.id)}
+                                onContextMenu={(e) =>
+                                    handleContextMenu(e, window.id)
+                                }
+                                className={`p-1.5 rounded border-2 flex items-center justify-center w-10 h-10 shadow-md ${
+                                    window.isMinimized
+                                        ? "bg-gray-200 border-gray-400 opacity-80"
+                                        : "bg-blue-500 border-blue-700"
+                                } hover:bg-blue-400 hover:border-blue-600 transition-all active:inset-shadow`}
+                                title={window.title}
+                            >
+                                <Image
+                                    src={window.iconPath}
+                                    alt={window.title}
+                                    width={28}
+                                    height={28}
+                                />
+                            </button>
+                        ))}
+
+                        {/* Menu contextuel */}
+                        {contextMenu && (
+                            <div
+                                className="fixed bg-white border-2 border-gray-300 rounded shadow-lg z-50"
+                                style={{
+                                    left: `${contextMenu.x}px`,
+                                    top: `${contextMenu.y - 50}px`,
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <button
+                                    onClick={() =>
+                                        handleCloseWindow(contextMenu.windowId)
+                                    }
+                                    className="px-4 py-2 hover:bg-gray-200 w-full text-left text-gray-800"
+                                >
+                                    Fermer la fenêtre
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Heure */}
-                <div>
-                    <span className="text-3xl px-3 py-2 bg-gray-300 rounded-lg">
-                        {currentTime}
-                    </span>
+                {/* Informations de droite (Météo, Heure) */}
+                <div className="flex gap-4 bg-linear-to-r from-[#7195FF] to-[#9EDCFF] rounded-bl-2xl px-6 items-center shadow-md border-l border-b border-white/30 h-full">
+                    {/* Bouton IA */}
+                    <button
+                        onClick={onToggleIaPanel}
+                        className="flex items-center justify-center w-9 h-9 bg-blue-600 rounded-full border-2 border-white shadow-lg hover:bg-blue-500 active:scale-95 transition-all"
+                        title="Assistant IA"
+                    >
+                        <span className="text-white font-bold text-xs">IA</span>
+                    </button>
+
+                    {/* Météo */}
+                    <div className="flex items-center">
+                        <span className="text-sm px-3 py-1 bg-white/20 rounded-full text-white font-bold shadow-inner border border-white/10 backdrop-blur-sm">
+                            {currentWeather || "--°C"}
+                        </span>
+                    </div>
+
+                    {/* Heure */}
+                    <div className="flex items-center">
+                        <span className="text-sm px-3 py-1 bg-white/20 rounded-full text-white font-bold shadow-inner border border-white/10 backdrop-blur-sm">
+                            {currentTime}
+                        </span>
+                    </div>
                 </div>
             </div>
         </footer>
