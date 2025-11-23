@@ -157,14 +157,14 @@ export default function Footer({ className, onToggleIaPanel }) {
 
                     {/* Météo */}
                     <div className="flex items-center">
-                        <span className="text-sm px-3 py-1 bg-white/20 rounded-full text-white font-bold shadow-inner border border-white/10 backdrop-blur-sm">
+                        <span className="text-2xl px-3 py-1 bg-white/20 rounded-full text-balck font-bold shadow-inner border border-white/10 backdrop-blur-sm">
                             {currentWeather || "--°C"}
                         </span>
                     </div>
 
                     {/* Heure */}
                     <div className="flex items-center">
-                        <span className="text-sm px-3 py-1 bg-white/20 rounded-full text-white font-bold shadow-inner border border-white/10 backdrop-blur-sm">
+                        <span className="text-2xl px-3 py-1 bg-white/20 rounded-full text-balck font-bold shadow-inner border border-white/10 backdrop-blur-sm">
                             {currentTime}
                         </span>
                     </div>
