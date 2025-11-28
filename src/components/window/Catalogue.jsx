@@ -26,7 +26,7 @@ const categories = [
 /**
  * Composant Catalogue affichant la liste des composants disponibles à l'achat.
  */
-export default function Catalogue() {
+export default function Catalogue({ player, onAddToCart }) {
     const [selectedCategory, setSelectedCategory] = useState(categories[0]);
     const [selectedItem, setSelectedItem] = useState(null);
     const listRef = useRef(null);
@@ -36,6 +36,41 @@ export default function Catalogue() {
         setSelectedItem(null);
         if (listRef.current) {
             listRef.current.scrollTop = 0;
+        }
+    };
+
+    const handleAction = () => {
+        if (!selectedItem) return;
+
+        if (onAddToCart) {
+            // Mode Panier
+            onAddToCart({ ...selectedItem, category: selectedCategory.id });
+        } else if (player) {
+            // Mode Achat Direct (Legacy ou autre usage)
+            try {
+                player.debit(selectedItem.price);
+
+                // Mapping des catégories vers les types d'inventaire
+                const typeMapping = {
+                    processors: "cpu",
+                    motherboards: "motherboard",
+                    graphicsCards: "gpu",
+                    ramModules: "ram",
+                    powerSupplies: "psu",
+                    cpuCoolers: "cooler",
+                    cases: "case",
+                    rackBays: "rackBay",
+                    storageDevices: "storage",
+                };
+
+                const type =
+                    typeMapping[selectedCategory.id] || selectedCategory.id;
+                player.inventory.add(selectedItem, type);
+
+                alert(`Acheté : ${selectedItem.model}`);
+            } catch (error) {
+                alert(error.message);
+            }
         }
     };
 
@@ -119,6 +154,14 @@ export default function Catalogue() {
                         <p className="text-xl font-bold text-green-700 mt-2">
                             {selectedItem.price} €
                         </p>
+                        {(player || onAddToCart) && (
+                            <button
+                                onClick={handleAction}
+                                className="mt-2 w-full bg-green-600 text-white font-bold py-1 px-2 rounded shadow hover:bg-green-700 active:translate-y-0.5"
+                            >
+                                {onAddToCart ? "Ajouter au panier" : "Acheter"}
+                            </button>
+                        )}
                     </div>
 
                     <div className="text-xs">

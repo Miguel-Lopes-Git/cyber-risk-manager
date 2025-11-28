@@ -15,6 +15,11 @@ export default class Server {
         this.ram = [];
         this.storage = [];
         this.case = null;
+
+        // Propriétés de gestion
+        this.hostingType = null; // 'WEB', 'GAME', 'DATABASE', etc.
+        this.clients = []; // Liste des contrats clients actifs
+        this.status = "offline"; // 'online', 'offline', 'maintenance'
     }
 
     /**
@@ -98,6 +103,102 @@ export default class Server {
         this.storage.forEach((s) => (total += s.price || 0));
 
         return total;
+    }
+
+    /**
+     * Calcule les ressources totales disponibles sur le serveur.
+     * @returns {Object} - { cpuScore, ramCapacity, storageCapacity }
+     */
+    getResources() {
+        let cpuScore = 0;
+        this.processors.forEach((p) => {
+            // Score arbitraire : Cores * Fréquence (GHz)
+            cpuScore += p.cores * p.frequency;
+        });
+
+        let ramCapacity = 0;
+        this.ram.forEach((r) => {
+            ramCapacity += r.capacity * (r.modules || 1);
+        });
+
+        let storageCapacity = 0;
+        this.storage.forEach((s) => {
+            storageCapacity += s.capacity;
+        });
+
+        return {
+            cpuScore: Math.round(cpuScore * 10) / 10,
+            ramCapacity,
+            storageCapacity,
+        };
+    }
+
+    /**
+     * Calcule les ressources actuellement utilisées par les clients.
+     * @returns {Object} - { cpuUsed, ramUsed, storageUsed }
+     */
+    getUsedResources() {
+        let cpuUsed = 0;
+        let ramUsed = 0;
+        let storageUsed = 0;
+
+        this.clients.forEach((client) => {
+            cpuUsed += client.requirements.cpu || 0;
+            ramUsed += client.requirements.ram || 0;
+            storageUsed += client.requirements.storage || 0;
+        });
+
+        return {
+            cpuUsed,
+            ramUsed,
+            storageUsed,
+        };
+    }
+
+    /**
+     * Ajoute un client au serveur si les ressources le permettent.
+     * @param {Object} clientOffer - L'offre client acceptée.
+     * @returns {boolean} - Succès ou échec.
+     */
+    addClient(clientOffer) {
+        if (this.hostingType && this.hostingType !== clientOffer.type) {
+            throw new Error(
+                `Type d'hébergement incompatible (Serveur: ${this.hostingType}, Client: ${clientOffer.type})`
+            );
+        }
+
+        const total = this.getResources();
+        const used = this.getUsedResources();
+
+        if (
+            used.cpuUsed + clientOffer.requirements.cpu > total.cpuScore ||
+            used.ramUsed + clientOffer.requirements.ram > total.ramCapacity ||
+            used.storageUsed + clientOffer.requirements.storage >
+                total.storageCapacity
+        ) {
+            throw new Error("Ressources insuffisantes sur ce serveur.");
+        }
+
+        // Si c'est le premier client, on fixe le type du serveur
+        if (this.clients.length === 0) {
+            this.hostingType = clientOffer.type;
+        }
+
+        this.clients.push({
+            ...clientOffer,
+            joinedAt: Date.now(),
+        });
+        return true;
+    }
+
+    /**
+     * Retire un client du serveur.
+     * @param {number} clientId - L'ID du client à retirer.
+     */
+    removeClient(clientId) {
+        this.clients = this.clients.filter((c) => c.id !== clientId);
+        // Si plus de clients, on peut reset le type (optionnel, ou manuel)
+        // Pour l'instant on garde le type défini manuellement ou par le premier client
     }
 
     // --------------------------------------------------------------------------

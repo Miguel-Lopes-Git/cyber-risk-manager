@@ -1,14 +1,4 @@
 import { React, useEffect, useState } from "react";
-import {
-    cases,
-    motherboards,
-    processors,
-    cpuCoolers,
-    ramModules,
-    graphicsCards,
-    powerSupplies,
-    storageDevices,
-} from "@/data/initialData";
 import Server from "@/classes/Server";
 
 /**
@@ -18,9 +8,9 @@ import Server from "@/classes/Server";
  * @param {Function} props.onCancel - Fonction appelée pour annuler la construction.
  * @param {Function} props.onComplete - Fonction appelée pour valider la construction.
  * @param {number} props.initialSlot - Le slot U de départ sélectionné.
- * @param {number} props.playerBalance - Le solde actuel du joueur.
+ * @param {Object} props.player - Le joueur actuel (pour l'inventaire).
  */
-function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
+function ServerBuilder({ onCancel, onComplete, initialSlot, player }) {
     const [config, setConfig] = useState({
         case: null,
         motherboard: null,
@@ -33,14 +23,6 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
     });
 
     const [showSelector, setShowSelector] = useState(null); // 'case', 'motherboard', etc.
-
-    // Calcul du prix total de la configuration
-    const totalPrice = Object.entries(config).reduce((sum, [key, item]) => {
-        if (Array.isArray(item)) {
-            return sum + item.reduce((s, i) => s + i.price, 0);
-        }
-        return sum + (item ? item.price : 0);
-    }, 0);
 
     // Gestion de la sélection des composants
     const handleSelect = (type, item) => {
@@ -154,42 +136,44 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
         });
     };
 
-    // Filtre les composants compatibles
+    // Filtre les composants compatibles ET disponibles dans l'inventaire
     const getFilteredItems = (type) => {
+        const inventoryItems = player.inventory.getItemsByType(type);
+
         switch (type) {
             case "case":
-                return Object.values(cases);
+                return inventoryItems;
             case "motherboard":
                 if (!config.case) return [];
-                return Object.values(motherboards).filter((mb) =>
+                return inventoryItems.filter((mb) =>
                     config.case.supportedMotherboards.includes(mb.formFactor)
                 );
             case "cpu":
                 if (!config.motherboard) return [];
-                return Object.values(processors).filter(
+                return inventoryItems.filter(
                     (cpu) => cpu.socket === config.motherboard.socket
                 );
             case "cooler":
                 if (!config.cpu || !config.case) return [];
-                return Object.values(cpuCoolers).filter(
+                return inventoryItems.filter(
                     (c) =>
                         c.isCompatibleWithSocket(config.cpu.socket) &&
                         c.height <= config.case.cpuCoolerMaxHeight
                 );
             case "ram":
                 if (!config.motherboard) return [];
-                return Object.values(ramModules).filter(
+                return inventoryItems.filter(
                     (r) => r.type === config.motherboard.memoryType
                 );
             case "gpu":
                 if (!config.motherboard || !config.case) return [];
                 // Vérifie la compatibilité avec la longueur maximale du boîtier
-                return Object.values(graphicsCards).filter(
+                return inventoryItems.filter(
                     (g) => g.length <= config.case.gpuMaxLength
                 );
             case "storage":
                 if (!config.motherboard) return [];
-                return Object.values(storageDevices).filter((s) => {
+                return inventoryItems.filter((s) => {
                     if (s.formFactor === "M.2")
                         return config.motherboard.m2Slots.length > 0;
                     return config.motherboard.sataPorts > 0;
@@ -197,7 +181,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             case "psu":
                 if (!config.case) return [];
                 // Vérifie la compatibilité avec la longueur maximale de l'alimentation
-                return Object.values(powerSupplies).filter((p) =>
+                return inventoryItems.filter((p) =>
                     config.case.psuMaxLength
                         ? p.length <= config.case.psuMaxLength
                         : true
@@ -230,12 +214,8 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
         }
     };
 
-    const handleBuy = () => {
-        if (playerBalance < totalPrice) {
-            alert("Fonds insuffisants !");
-            return;
-        }
-        // Vérification finale avant achat (suppose que les filtres ont fonctionné)
+    const handleAssemble = () => {
+        // Vérification finale avant assemblage
         if (
             !config.case ||
             !config.motherboard ||
@@ -249,7 +229,12 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             return;
         }
 
-        onComplete(config, totalPrice);
+        // Vérifier si on a assez de stock pour les items multiples (RAM, GPU, Storage)
+        // C'est une vérification basique, idéalement on devrait décrémenter un compteur temporaire
+        // Mais comme on sélectionne depuis l'inventaire, on suppose que l'utilisateur fait attention
+        // TODO: Améliorer la gestion des quantités multiples lors de la sélection
+
+        onComplete(config);
     };
 
     return (
@@ -372,7 +357,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                     {showSelector ? (
                         <div className="h-full flex flex-col">
                             <h3 className="text-xl font-bold text-[#0B318F] mb-4 border-b-2 border-[#ACA899] pb-2 capitalize">
-                                Sélection : {showSelector}
+                                Sélection : {showSelector} (Inventaire)
                             </h3>
                             <div className="flex-1 overflow-auto">
                                 <table className="w-full text-left border-collapse">
@@ -382,7 +367,7 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                                                 Modèle
                                             </th>
                                             <th className="p-2 border border-[#ACA899] text-lg text-right text-[#0B318F]">
-                                                Prix
+                                                Stock
                                             </th>
                                             <th className="p-2 border border-[#ACA899] text-lg text-center text-[#0B318F]">
                                                 Action
@@ -424,7 +409,9 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                                                             )}
                                                         </td>
                                                         <td className="p-2 border border-[#E0DFE3] text-lg text-right font-mono">
-                                                            {item.price} €
+                                                            {
+                                                                item.inventoryQuantity
+                                                            }
                                                         </td>
                                                         <td className="p-2 border border-[#E0DFE3] text-center">
                                                             <button
@@ -449,7 +436,8 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                                                     className="p-8 text-center text-xl text-gray-500 italic"
                                                 >
                                                     Aucun composant compatible
-                                                    trouvé.
+                                                    trouvé dans votre
+                                                    inventaire.
                                                 </td>
                                             </tr>
                                         )}
@@ -473,11 +461,13 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
             {/* Actions du pied de page (Total et Achat) */}
             <div className="mt-2 border-t-2 border-[#ACA899] pt-2 flex justify-between items-center bg-[#ECE9D8] p-2">
                 <div className="text-2xl font-bold text-[#0B318F]">
-                    Total:{" "}
-                    <span className="text-green-700">{totalPrice} €</span>
+                    {/* Plus de prix total ici car c'est déjà acheté */}
+                    <span className="text-gray-600 text-sm">
+                        Pièces provenant de l'inventaire
+                    </span>
                 </div>
                 <button
-                    onClick={handleBuy}
+                    onClick={handleAssemble}
                     disabled={
                         !config.case ||
                         !config.motherboard ||
@@ -499,8 +489,240 @@ function ServerBuilder({ onCancel, onComplete, initialSlot, playerBalance }) {
                             : "bg-[#0058EE] border-[#003C74] text-white hover:bg-[#3593FF]"
                     }`}
                 >
-                    Acheter et Assembler
+                    Assembler le Serveur
                 </button>
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Composant Dashboard pour gérer un serveur existant.
+ */
+function ServerDashboard({ server, onBack, onDismantle, onUpdate }) {
+    const resources = server.getResources();
+    const used = server.getUsedResources();
+
+    const getUsagePercent = (used, total) => {
+        if (total === 0) return 0;
+        return Math.min(100, Math.round((used / total) * 100));
+    };
+
+    const handleTypeChange = (e) => {
+        if (server.clients.length > 0) {
+            alert(
+                "Impossible de changer le type d'hébergement tant que des clients sont actifs."
+            );
+            return;
+        }
+        server.hostingType = e.target.value;
+        onUpdate();
+    };
+
+    return (
+        <div className="absolute inset-0 bg-[#ECE9D8] z-50 flex flex-col p-1 font-sans">
+            {/* Header */}
+            <div className="bg-linear-to-r from-[#0058EE] to-[#3593FF] p-2 flex justify-between items-center rounded-t-lg border-b-2 border-[#003C74]">
+                <h2 className="text-2xl font-bold text-white drop-shadow-md">
+                    Gestion du Serveur - {server.case.brand.name}{" "}
+                    {server.case.model}
+                </h2>
+                <button
+                    onClick={onBack}
+                    className="bg-[#D83B01] hover:bg-[#E8501E] text-white font-bold px-3 py-1 rounded border border-white shadow-md"
+                >
+                    X
+                </button>
+            </div>
+
+            <div className="flex-1 flex overflow-hidden bg-[#ECE9D8] p-4 gap-4">
+                {/* Colonne Gauche : Stats & Config */}
+                <div className="w-1/2 flex flex-col gap-4">
+                    {/* Panneau Type d'hébergement */}
+                    <div className="bg-white border-2 border-[#ACA899] p-4 rounded shadow-sm">
+                        <h3 className="text-lg font-bold text-[#0B318F] mb-2 border-b border-[#ACA899] pb-1">
+                            Configuration
+                        </h3>
+                        <div className="flex items-center gap-2 mb-2">
+                            <label className="font-bold text-gray-700">
+                                Type :
+                            </label>
+                            <select
+                                value={server.hostingType || ""}
+                                onChange={handleTypeChange}
+                                className="border border-[#ACA899] p-1 rounded w-full"
+                                disabled={server.clients.length > 0}
+                            >
+                                <option value="">-- Non défini --</option>
+                                <option value="WEB">Hébergement Web</option>
+                                <option value="GAME">Serveur de Jeux</option>
+                                <option value="DB">Base de Données</option>
+                                <option value="CLOUD">Stockage Cloud</option>
+                            </select>
+                        </div>
+                        <p className="text-sm text-gray-500 italic">
+                            {server.clients.length > 0
+                                ? "Type verrouillé par les contrats actifs."
+                                : "Définissez un type pour recevoir des offres spécifiques."}
+                        </p>
+                    </div>
+
+                    {/* Panneau Ressources */}
+                    <div className="bg-white border-2 border-[#ACA899] p-4 rounded shadow-sm flex-1">
+                        <h3 className="text-lg font-bold text-[#0B318F] mb-4 border-b border-[#ACA899] pb-1">
+                            Ressources Système
+                        </h3>
+
+                        {/* CPU */}
+                        <div className="mb-4">
+                            <div className="flex justify-between mb-1">
+                                <span className="font-bold text-gray-700">
+                                    CPU
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                    {used.cpuUsed} / {resources.cpuScore} pts
+                                </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4 border border-gray-400">
+                                <div
+                                    className="bg-blue-600 h-full rounded-full transition-all duration-500"
+                                    style={{
+                                        width: `${getUsagePercent(
+                                            used.cpuUsed,
+                                            resources.cpuScore
+                                        )}%`,
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+
+                        {/* RAM */}
+                        <div className="mb-4">
+                            <div className="flex justify-between mb-1">
+                                <span className="font-bold text-gray-700">
+                                    RAM
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                    {used.ramUsed} / {resources.ramCapacity} GB
+                                </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4 border border-gray-400">
+                                <div
+                                    className="bg-green-600 h-full rounded-full transition-all duration-500"
+                                    style={{
+                                        width: `${getUsagePercent(
+                                            used.ramUsed,
+                                            resources.ramCapacity
+                                        )}%`,
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+
+                        {/* Storage */}
+                        <div className="mb-4">
+                            <div className="flex justify-between mb-1">
+                                <span className="font-bold text-gray-700">
+                                    Stockage
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                    {used.storageUsed} /{" "}
+                                    {resources.storageCapacity} GB
+                                </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4 border border-gray-400">
+                                <div
+                                    className="bg-orange-500 h-full rounded-full transition-all duration-500"
+                                    style={{
+                                        width: `${getUsagePercent(
+                                            used.storageUsed,
+                                            resources.storageCapacity
+                                        )}%`,
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Colonne Droite : Clients & Actions */}
+                <div className="w-1/2 flex flex-col gap-4">
+                    {/* Liste des Clients */}
+                    <div className="bg-white border-2 border-[#ACA899] p-4 rounded shadow-sm flex-1 overflow-hidden flex flex-col">
+                        <h3 className="text-lg font-bold text-[#0B318F] mb-2 border-b border-[#ACA899] pb-1">
+                            Clients Actifs ({server.clients.length})
+                        </h3>
+                        <div className="flex-1 overflow-auto">
+                            {server.clients.length > 0 ? (
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-gray-100 sticky top-0">
+                                        <tr>
+                                            <th className="p-2 border-b">
+                                                Client
+                                            </th>
+                                            <th className="p-2 border-b text-right">
+                                                Revenu
+                                            </th>
+                                            <th className="p-2 border-b text-center">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {server.clients.map((client) => (
+                                            <tr
+                                                key={client.id}
+                                                className="border-b hover:bg-gray-50"
+                                            >
+                                                <td className="p-2">
+                                                    {client.clientName}
+                                                </td>
+                                                <td className="p-2 text-right text-green-600 font-bold">
+                                                    {client.revenue}€/h
+                                                </td>
+                                                <td className="p-2 text-center">
+                                                    <button
+                                                        onClick={() => {
+                                                            server.removeClient(
+                                                                client.id
+                                                            );
+                                                            onUpdate();
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 font-bold text-xs border border-red-200 px-2 py-1 rounded bg-red-50"
+                                                    >
+                                                        Résilier
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="text-gray-500 italic text-center mt-4">
+                                    Aucun client actif.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Actions Critiques */}
+                    <div className="bg-red-50 border-2 border-red-200 p-4 rounded shadow-sm">
+                        <h3 className="text-lg font-bold text-red-600 mb-2">
+                            Zone de Danger
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-2">
+                            Démanteler le serveur renverra tous les composants
+                            dans votre inventaire. Les contrats clients seront
+                            perdus.
+                        </p>
+                        <button
+                            onClick={onDismantle}
+                            className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 shadow-md"
+                        >
+                            DÉMANTELER LE SERVEUR
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -516,7 +738,8 @@ export default function ServerWindow({ Player }) {
     // Force le re-rendu lors d'une modification de l'état du joueur
     const [, setRender] = useState(0);
     const [selectedSlot, setSelectedSlot] = useState(null);
-    const [isConfiguring, setIsConfiguring] = useState(false);
+    const [viewMode, setViewMode] = useState("rack"); // 'rack', 'builder', 'dashboard'
+    const [selectedServer, setSelectedServer] = useState(null);
 
     const forceUpdate = () => setRender((prev) => prev + 1);
 
@@ -534,19 +757,20 @@ export default function ServerWindow({ Player }) {
     const totalU = rackBay.totalU;
 
     const handleSlotClick = (u) => {
-        // Si le slot est occupé, affiche les infos du serveur installé
+        // Si le slot est occupé, ouvre le dashboard
         if (rackBay.getCaseAt(u)) {
             const installed = rackBay.getCaseAt(u);
-            alert(
-                `Serveur: ${installed.component.brand.name} ${installed.component.model}`
-            );
+            setSelectedServer(installed.component);
+            setSelectedSlot(u); // On garde le slot pour référence (suppression)
+            setViewMode("dashboard");
             return;
         }
+        // Sinon ouvre le builder
         setSelectedSlot(u);
-        setIsConfiguring(true);
+        setViewMode("builder");
     };
 
-    const handleBuildComplete = (config, totalPrice) => {
+    const handleBuildComplete = (config) => {
         try {
             // Instancie un nouveau serveur
             const newServer = new Server();
@@ -561,18 +785,78 @@ export default function ServerWindow({ Player }) {
 
             newServer.setPowerSupply(config.psu);
 
+            // Retire les composants de l'inventaire
+            Player.inventory.remove(config.case);
+            Player.inventory.remove(config.motherboard);
+            Player.inventory.remove(config.cpu);
+            Player.inventory.remove(config.cooler);
+            config.ram.forEach((r) => Player.inventory.remove(r));
+            config.gpu.forEach((g) => Player.inventory.remove(g));
+            config.storage.forEach((s) => Player.inventory.remove(s));
+            Player.inventory.remove(config.psu);
+
             // Ajoute le serveur au rack
             rackBay.addCase(config.case, selectedSlot);
-
-            // Débite le coût du serveur au joueur
-            Player.debit(totalPrice);
+            // Associe l'objet serveur logique au boîtier physique (hack rapide pour lier les deux)
+            // Idéalement, rackBay devrait stocker l'objet Server, pas juste le Case.
+            // Mais rackBay stocke { component: Case, startU: number }
+            // On va attacher l'instance Server à l'objet Case pour la persistance en mémoire
+            config.case.serverInstance = newServer;
 
             // Réinitialise l'interface utilisateur
-            setIsConfiguring(false);
+            setViewMode("rack");
             setSelectedSlot(null);
             forceUpdate();
         } catch (error) {
-            alert(`Erreur lors de l'achat : ${error.message}`);
+            alert(`Erreur lors de l'assemblage : ${error.message}`);
+        }
+    };
+
+    const handleDismantle = () => {
+        if (
+            !confirm(
+                "Êtes-vous sûr de vouloir démanteler ce serveur ? Tous les composants retourneront dans l'inventaire."
+            )
+        )
+            return;
+
+        try {
+            // Récupérer le serveur
+            const installed = rackBay.getCaseAt(selectedSlot);
+            if (!installed) return;
+
+            const server = installed.component.serverInstance; // Notre lien créé plus haut
+            // Si le serveur a été créé avant cette mise à jour, il n'a peut-être pas serverInstance
+            // Dans ce cas, on ne peut récupérer que le boîtier, ce qui est problématique.
+            // On va supposer que pour les nouveaux serveurs ça marche.
+            // Pour les anciens, on récupère juste le boîtier.
+
+            if (server) {
+                // Remettre tout dans l'inventaire
+                Player.inventory.add(server.case);
+                if (server.motherboard)
+                    Player.inventory.add(server.motherboard);
+                server.processors.forEach((p) => Player.inventory.add(p));
+                server.cpuCoolers.forEach((c) => Player.inventory.add(c));
+                server.ram.forEach((r) => Player.inventory.add(r));
+                server.gpus.forEach((g) => Player.inventory.add(g));
+                server.storage.forEach((s) => Player.inventory.add(s));
+                if (server.psu) Player.inventory.add(server.psu);
+            } else {
+                // Fallback: on rend juste le boîtier
+                Player.inventory.add(installed.component);
+            }
+
+            // Retirer du rack
+            rackBay.removeCase(selectedSlot);
+
+            setViewMode("rack");
+            setSelectedSlot(null);
+            setSelectedServer(null);
+            forceUpdate();
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors du démantèlement.");
         }
     };
 
@@ -604,24 +888,26 @@ export default function ServerWindow({ Player }) {
                     const heightStyle = {
                         height: `${installedCase.component.sizeU * 40}px`,
                     }; // Hauteur ajustée à 40px par U pour une meilleure lisibilité
+                    
+                    // Vérifier si le serveur a une instance liée
+                    const hasInstance = !!installedCase.component.serverInstance;
+                    const serverStatus = hasInstance ? (installedCase.component.serverInstance.clients.length > 0 ? "🟢" : "⚪") : "❓";
+
                     slots.push(
                         <div
                             key={u}
-                            className="border-2 border-black bg-gray-300 m-1 flex items-center justify-center cursor-pointer hover:bg-gray-400 relative shadow-md"
+                            className="border-2 border-black bg-gray-300 m-1 flex items-center justify-center cursor-pointer hover:bg-gray-400 relative shadow-md group"
                             style={heightStyle}
-                            onClick={() =>
-                                alert(
-                                    `Serveur: ${installedCase.component.brand.name} ${installedCase.component.model}`
-                                )
-                            }
+                            onClick={() => handleSlotClick(u)}
                         >
                             <span className="font-bold text-xl text-gray-800">
-                                {installedCase.component.brand.name}{" "}
+                                {serverStatus} {installedCase.component.brand.name}{" "}
                                 {installedCase.component.model}
                             </span>
                             <div className="absolute top-0 left-0 bg-blue-600 text-white text-sm font-bold px-2 py-1">
                                 U{u}
                             </div>
+                            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
                         </div>
                     );
                 }
@@ -647,12 +933,28 @@ export default function ServerWindow({ Player }) {
 
     return (
         <div className="p-4 flex flex-col h-full relative">
-            {isConfiguring && (
+            {viewMode === "builder" && (
                 <ServerBuilder
-                    onCancel={() => setIsConfiguring(false)}
+                    onCancel={() => {
+                        setViewMode("rack");
+                        setSelectedSlot(null);
+                    }}
                     onComplete={handleBuildComplete}
                     initialSlot={selectedSlot}
-                    playerBalance={Player.getSolde()}
+                    player={Player}
+                />
+            )}
+
+            {viewMode === "dashboard" && selectedServer && (
+                <ServerDashboard
+                    server={selectedServer.serverInstance || new Server()} // Fallback pour éviter crash si pas d'instance
+                    onBack={() => {
+                        setViewMode("rack");
+                        setSelectedSlot(null);
+                        setSelectedServer(null);
+                    }}
+                    onDismantle={handleDismantle}
+                    onUpdate={forceUpdate}
                 />
             )}
 

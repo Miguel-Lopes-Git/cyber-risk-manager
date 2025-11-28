@@ -1,4 +1,5 @@
 import RackBay from "./RackBay.js";
+import Inventory from "./Inventory.js";
 
 /**
  * Représente un joueur dans le jeu.
@@ -7,6 +8,7 @@ import RackBay from "./RackBay.js";
 export default class Player {
     // Attributs publics
     name = "";
+    inventory = new Inventory();
 
     // Attributs privés
     #solde = 0;
