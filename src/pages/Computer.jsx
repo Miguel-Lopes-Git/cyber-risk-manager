@@ -18,6 +18,7 @@ import BootScreen from "@/components/UI/BootScreen";
 import AuthScreen from "@/components/UI/AuthScreen";
 import LoadingSpinner from "@/components/UI/LoadingSpinner";
 import { supabase } from "@/lib/supabase";
+import { saveGame, loadGame, hasSave } from "@/lib/saveSystem";
 
 /**
  * Composant principal du contenu de l'ordinateur.
@@ -34,18 +35,78 @@ function ComputerContent() {
     const [isCheckingSession, setIsCheckingSession] = useState(true);
     const [autoLoginName, setAutoLoginName] = useState(null);
     const [mails, setMails] = useState([]);
+    const [saveLoaded, setSaveLoaded] = useState(false);
 
     /**
      * Gère la connexion réussie (depuis AuthScreen ou session existante).
      */
     const handleLoginSuccess = (username) => {
-        player.setName(username);
-        player.credit(5000); // TODO: Récupérer le vrai solde depuis la DB si possible
-        console.log(
-            `Le solde actuel de ${player.name} est de ${player.getSolde()}€.`
-        );
+        // Tente de charger une sauvegarde existante
+        const savedData = loadGame();
+
+        if (savedData && savedData.player.name === username) {
+            // Restaure les données sauvegardées
+            setPlayer(savedData.player);
+            setMails(savedData.mails);
+            console.log(
+                `✅ Partie chargée pour ${username} - Solde: ${savedData.player.getSolde()}€`
+            );
+        } else {
+            // Nouvelle partie
+            player.setName(username);
+            player.credit(5000);
+            console.log(
+                `🆕 Nouvelle partie créée pour ${
+                    player.name
+                } - Solde: ${player.getSolde()}€`
+            );
+        }
+
+        setSaveLoaded(true);
         setIsLoggedIn(true);
     };
+
+    // -------------------------------------------------------------------------
+    // SYSTÈME DE SAUVEGARDE AUTOMATIQUE
+    // -------------------------------------------------------------------------
+
+    // Sauvegarde automatique toutes les 30 secondes
+    useEffect(() => {
+        if (!isLoggedIn || !saveLoaded) return;
+
+        const autoSave = () => {
+            const success = saveGame(player, mails);
+            if (success) {
+                console.log("💾 Sauvegarde automatique effectuée");
+            }
+        };
+
+        // Première sauvegarde après 5 secondes
+        const initialSave = setTimeout(autoSave, 5000);
+
+        // Puis toutes les 30 secondes
+        const saveInterval = setInterval(autoSave, 30000);
+
+        return () => {
+            clearTimeout(initialSave);
+            clearInterval(saveInterval);
+        };
+    }, [isLoggedIn, saveLoaded, player, mails]);
+
+    // Sauvegarde avant de quitter la page
+    useEffect(() => {
+        if (!isLoggedIn || !saveLoaded) return;
+
+        const handleBeforeUnload = (e) => {
+            saveGame(player, mails);
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isLoggedIn, saveLoaded, player, mails]);
 
     // -------------------------------------------------------------------------
     // LOGIQUE DE JEU (Offres & Revenus)
@@ -67,9 +128,10 @@ function ComputerContent() {
 
             // Calcul du revenu proposé (formule simple)
             // Base: 1€/pt CPU + 0.5€/GB RAM + 0.1€/GB Storage
-            const baseRevenue =
-                cpuReq * 1.0 + ramReq * 0.5 + storageReq * 0.1;
-            const revenue = Math.round(baseRevenue * (0.8 + Math.random() * 0.4)); // Variation +/- 20%
+            const baseRevenue = cpuReq * 1.0 + ramReq * 0.5 + storageReq * 0.1;
+            const revenue = Math.round(
+                baseRevenue * (0.8 + Math.random() * 0.4)
+            ); // Variation +/- 20%
 
             const newMail = {
                 id: id,
@@ -95,7 +157,7 @@ function ComputerContent() {
 
         // Génère une offre toutes les 30 secondes
         const offerInterval = setInterval(generateOffer, 30000);
-        
+
         // Génère une première offre immédiatement pour tester
         setTimeout(generateOffer, 2000);
 
@@ -113,9 +175,13 @@ function ComputerContent() {
             // Parcourt tous les serveurs
             for (let u = 1; u <= rack.totalU; u++) {
                 const installed = rack.getCaseAt(u);
-                if (installed && installed.startU === u && installed.component.serverInstance) {
+                if (
+                    installed &&
+                    installed.startU === u &&
+                    installed.component.serverInstance
+                ) {
                     const server = installed.component.serverInstance;
-                    server.clients.forEach(client => {
+                    server.clients.forEach((client) => {
                         totalRevenue += client.revenue;
                     });
                 }
@@ -143,16 +209,25 @@ function ComputerContent() {
         // Stratégie simple : Premier serveur qui accepte
         for (let u = 1; u <= rack.totalU; u++) {
             const installed = rack.getCaseAt(u);
-            if (installed && installed.startU === u && installed.component.serverInstance) {
+            if (
+                installed &&
+                installed.startU === u &&
+                installed.component.serverInstance
+            ) {
                 const server = installed.component.serverInstance;
-                
+
                 // Vérifie si le serveur est compatible (Type et Ressources)
                 try {
                     // Si le serveur n'a pas de type, il prendra le type de l'offre
-                    if (!server.hostingType || server.hostingType === offer.type) {
+                    if (
+                        !server.hostingType ||
+                        server.hostingType === offer.type
+                    ) {
                         server.addClient(offer);
                         accepted = true;
-                        alert(`Offre acceptée ! Client hébergé sur le serveur en U${u}.`);
+                        alert(
+                            `Offre acceptée ! Client hébergé sur le serveur en U${u}.`
+                        );
                         break; // Stop après avoir trouvé un serveur
                     }
                 } catch (e) {
@@ -164,8 +239,15 @@ function ComputerContent() {
 
         if (accepted) {
             setMails((prev) => prev.filter((m) => m.id !== mail.id));
+            // Sauvegarde après acceptation d'une offre
+            saveGame(
+                player,
+                mails.filter((m) => m.id !== mail.id)
+            );
         } else {
-            alert("Aucun serveur disponible ou ressources insuffisantes pour cette offre.");
+            alert(
+                "Aucun serveur disponible ou ressources insuffisantes pour cette offre."
+            );
         }
     };
 
@@ -281,10 +363,10 @@ function ComputerContent() {
                                 openWindow(
                                     "mail",
                                     "Mail",
-                                    <Mail 
-                                        mails={mails} 
-                                        onAcceptOffer={handleAcceptOffer} 
-                                        onRefuseOffer={handleRefuseOffer} 
+                                    <Mail
+                                        mails={mails}
+                                        onAcceptOffer={handleAcceptOffer}
+                                        onRefuseOffer={handleRefuseOffer}
                                     />,
                                     "/images/icons/mail.png"
                                 )
@@ -352,6 +434,7 @@ function ComputerContent() {
                         <Footer
                             className="z-100 row-end-13 col-span-full bg-linear-180 from-[#84A9FF] to-[#AAC4FF]"
                             onToggleIaPanel={() => setShowIaPanel(!showIaPanel)}
+                            onSaveGame={() => saveGame(player, mails)}
                         />
                     </div>
                 )}

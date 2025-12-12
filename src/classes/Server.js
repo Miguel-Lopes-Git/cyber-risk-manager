@@ -112,8 +112,16 @@ export default class Server {
     getResources() {
         let cpuScore = 0;
         this.processors.forEach((p) => {
-            // Score arbitraire : Cores * Fréquence (GHz)
-            cpuScore += p.cores * p.frequency;
+            // Calcul de score basé sur plusieurs facteurs
+            const coreScore = (p.cores || 0) * 10; // 10 points par cœur
+            const threadScore = (p.threads || 0) * 5; // 5 points par thread
+            const freqScore = (p.boostClock || p.baseClock || 0) * 8; // Fréquence boost/base * 8
+            const cacheScore = ((p.cacheL2 || 0) + (p.cacheL3 || 0)) * 2; // Cache L2+L3 * 2
+
+            // Score total du processeur
+            const processorScore =
+                coreScore + threadScore + freqScore + cacheScore;
+            cpuScore += processorScore;
         });
 
         let ramCapacity = 0;

@@ -888,10 +888,16 @@ export default function ServerWindow({ Player }) {
                     const heightStyle = {
                         height: `${installedCase.component.sizeU * 40}px`,
                     }; // Hauteur ajustée à 40px par U pour une meilleure lisibilité
-                    
+
                     // Vérifier si le serveur a une instance liée
-                    const hasInstance = !!installedCase.component.serverInstance;
-                    const serverStatus = hasInstance ? (installedCase.component.serverInstance.clients.length > 0 ? "🟢" : "⚪") : "❓";
+                    const hasInstance =
+                        !!installedCase.component.serverInstance;
+                    const serverStatus = hasInstance
+                        ? installedCase.component.serverInstance.clients
+                              .length > 0
+                            ? "🟢"
+                            : "⚪"
+                        : "❓";
 
                     slots.push(
                         <div
@@ -901,7 +907,8 @@ export default function ServerWindow({ Player }) {
                             onClick={() => handleSlotClick(u)}
                         >
                             <span className="font-bold text-xl text-gray-800">
-                                {serverStatus} {installedCase.component.brand.name}{" "}
+                                {serverStatus}{" "}
+                                {installedCase.component.brand.name}{" "}
                                 {installedCase.component.model}
                             </span>
                             <div className="absolute top-0 left-0 bg-blue-600 text-white text-sm font-bold px-2 py-1">

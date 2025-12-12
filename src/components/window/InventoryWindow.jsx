@@ -83,25 +83,33 @@ export default function InventoryWindow({ player }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredItems.map((item, index) => (
-                                <tr
-                                    key={index}
-                                    className="hover:bg-[#316AC5] hover:text-white group"
-                                >
-                                    <td className="border border-[#E0DFE3] px-2 py-1">
-                                        <span className="font-bold">
-                                            {item.component.brand?.name}
-                                        </span>{" "}
-                                        {item.component.model}
-                                    </td>
-                                    <td className="border border-[#E0DFE3] px-2 py-1 capitalize">
-                                        {item.type}
-                                    </td>
-                                    <td className="border border-[#E0DFE3] px-2 py-1 text-right font-mono font-bold">
-                                        {item.quantity}
-                                    </td>
-                                </tr>
-                            ))}
+                            {filteredItems.map((item, index) => {
+                                const brandName =
+                                    item.component?.brand?.name ||
+                                    "Marque inconnue";
+                                const modelName =
+                                    item.component?.model || "Modèle inconnu";
+
+                                return (
+                                    <tr
+                                        key={index}
+                                        className="hover:bg-[#316AC5] hover:text-white group"
+                                    >
+                                        <td className="border border-[#E0DFE3] px-2 py-1">
+                                            <span className="font-bold">
+                                                {brandName}
+                                            </span>{" "}
+                                            {modelName}
+                                        </td>
+                                        <td className="border border-[#E0DFE3] px-2 py-1 capitalize">
+                                            {item.type}
+                                        </td>
+                                        <td className="border border-[#E0DFE3] px-2 py-1 text-right font-mono font-bold">
+                                            {item.quantity}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 )}

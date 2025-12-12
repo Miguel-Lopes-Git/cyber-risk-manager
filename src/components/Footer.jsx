@@ -7,10 +7,13 @@ import Image from "next/image";
  * Affiche les fenêtres ouvertes, le menu contextuel, la météo et l'heure.
  * @param {Object} props - Les propriétés du composant.
  * @param {string} props.className - Classes CSS supplémentaires.
+ * @param {Function} props.onToggleIaPanel - Callback pour afficher le panneau IA.
+ * @param {Function} props.onSaveGame - Callback pour sauvegarder la partie.
  */
-export default function Footer({ className, onToggleIaPanel }) {
+export default function Footer({ className, onToggleIaPanel, onSaveGame }) {
     const [currentWeather, setCurrentWeather] = useState("");
     const [contextMenu, setContextMenu] = useState(null);
+    const [showSaveNotification, setShowSaveNotification] = useState(false);
     const { windows, restoreWindow, closeWindow } = useWindows();
 
     const handleContextMenu = (e, windowId) => {
@@ -146,6 +149,31 @@ export default function Footer({ className, onToggleIaPanel }) {
 
                 {/* Informations de droite (Météo, Heure) */}
                 <div className="flex gap-4 bg-linear-to-r from-[#7195FF] to-[#9EDCFF] rounded-bl-2xl px-6 items-center shadow-md border-l border-b border-white/30 h-full">
+                    {/* Bouton Sauvegarder */}
+                    <button
+                        onClick={() => {
+                            if (onSaveGame) {
+                                onSaveGame();
+                                setShowSaveNotification(true);
+                                setTimeout(
+                                    () => setShowSaveNotification(false),
+                                    2000
+                                );
+                            }
+                        }}
+                        className="flex items-center justify-center px-3 py-1 bg-green-600 rounded border-2 border-white shadow-lg hover:bg-green-500 active:scale-95 transition-all relative"
+                        title="Sauvegarder la partie"
+                    >
+                        <span className="text-white font-bold text-sm">💾</span>
+
+                        {/* Notification de sauvegarde */}
+                        {showSaveNotification && (
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-green-600 text-white px-3 py-1 rounded shadow-lg text-xs whitespace-nowrap">
+                                ✓ Sauvegardé !
+                            </div>
+                        )}
+                    </button>
+
                     {/* Bouton IA */}
                     <button
                         onClick={onToggleIaPanel}

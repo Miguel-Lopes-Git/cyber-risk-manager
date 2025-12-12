@@ -14,6 +14,7 @@ export default class Inventory {
      */
     add(component, type) {
         const key = component.model; // On utilise le modèle comme clé unique
+
         if (this.items[key]) {
             this.items[key].quantity += 1;
         } else {
